@@ -19,6 +19,17 @@ from io import BytesIO
 import requests
 #%%
 
+
+import random
+
+def generate_data(value):
+    # Genera una lista di 100 numeri casuali tra 0 e 100 per l'asse x
+    x = [random.uniform(0, 100) for _ in range(100)]
+    # Genera una lista di 100 numeri casuali tra 0 e 100 per l'asse y
+    y = [random.uniform(0, 100) for _ in range(100)]
+    return {'x': x, 'y': y}
+
+
 app = dash.Dash(__name__, 
                 title ='Tool PAC')
 server = app.server
@@ -168,6 +179,9 @@ app.layout = html.Div([
         
             #MESSAGGIO ROSSO/VERDE SOTTO TABELLA
             html.Div(id='output',style={'margin': 'auto', 'justify-content': 'center','display': 'flex'}),
+            
+            # Aggiungi questo nell'app.layout
+            dcc.Tabs(id='tabs', children=[]),
 
  ]) 
 
@@ -214,6 +228,48 @@ def update_table(selected_values, _):
             ])
             rows.append(row)
         return rows
+    
+    
+# Callback per aggiornare i tab
+@app.callback(
+    Output('tabs', 'children'),
+    Input('multi-dropdown', 'value'),
+    # Aggiungi questo input per resettare i tab quando cambia il valore del Basic Dropdown
+    Input('basic-dropdown', 'value')
+)
+def update_tabs(selected_values, _):
+    if selected_values is None or len(selected_values) == 0:
+        # Se non è selezionato nulla, ritorna una lista vuota
+        return []
+    else:
+        # Crea un dcc.Tab per ciascun valore selezionato
+        tabs = []
+        for value in selected_values:
+            # Assumendo che tu abbia una funzione generate_data che restituisce dati basati sul valore
+            data = generate_data(value)
+
+            tab = dcc.Tab(label=value, children=[
+                # Aggiungi un grafico
+                dcc.Graph(
+                    id=f'graph-{value}',
+                    figure={
+                        'data': [
+                            go.Scatter(
+                                x = data['x'],  # Sostituisci con i tuoi dati
+                                y = data['y'],  # Sostituisci con i tuoi dati
+                                mode = 'lines+markers',
+                                name = 'Grafico'
+                            )
+                        ],
+                        'layout': go.Layout(
+                            title = f'Grafico per {value}'
+                        )
+                    }
+                )
+            ])
+            tabs.append(tab)
+        return tabs
+ 
 
 if __name__ == '__main__':
     app.run_server()
