@@ -63,7 +63,7 @@ app.index_string = '''
 basic_options = {
     'Opzione 1': [{'label': 'Sotto-opzione 1.1', 'value': '1.1'}, {'label': 'Sotto-opzione 1.2', 'value': '1.2'}],
     'Opzione 2': [{'label': 'Sotto-opzione 2.1', 'value': '2.1'}, {'label': 'Sotto-opzione 2.2', 'value': '2.2'}],
-    'Opzione 3': [{'label': 'Sotto-opzione 3.1', 'value': '3.1'}, {'label': 'Sotto-opzione 3.2', 'value': '3.2'}],
+    'Opzione 3': [{'label': 'Sotto-opzione 3.1', 'value': '3.1'}, {'label': 'Sotto-opzione 3.2', 'value': '3.2'}, {'label': 'Sotto-opzione 55', 'value': '44'}, {'label': 'Sotto-opzione 23', 'value': '23'}, {'label': 'Sotto-opzione 12', 'value': '89'}],
 }
 
 
