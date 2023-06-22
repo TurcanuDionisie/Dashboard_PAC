@@ -96,6 +96,8 @@ app.index_string = '''
 '''
 
 
+
+
 app.layout = html.Div([
     dcc.Dropdown(
         id='basic-dropdown',
@@ -120,8 +122,7 @@ app.layout = html.Div([
     [State('store-inputs', 'data')]
 )
 def update_store(input_values, input_ids, data):
-    for value, id in zip(input_values, input_ids):
-        data[id['index']] = value
+    data = {id['index']: value for value, id in zip(input_values, input_ids)}
     return data
 
 # Aggiorna le opzioni del multi-dropdown in base al valore del basic-dropdown
@@ -136,10 +137,12 @@ def update_multi_dropdown(selected_value):
 # Aggiorna la tabella con i nuovi input ogni volta che si modifica il valore del dropdown
 @app.callback(
     Output('my-table', 'children'),
-    [Input('multi-dropdown', 'value')]
+    [Input('multi-dropdown', 'value')],
+    [State('store-inputs', 'data')]
 )
-def update_table(selected_values):
+def update_table(selected_values, data):
     if selected_values is None or len(selected_values) == 0:
+        data.clear()
         return []
     else:
         rows = []
@@ -147,7 +150,7 @@ def update_table(selected_values):
             row = html.Tr(children=[
                 html.Td(children=value),
                 html.Td(children=dcc.Input(
-                    value="",
+                    value=data.get(value, ""),
                     id={'type': 'dynamic-input', 'index': value},  # usa il valore come indice dell'id
                     type='text'
                 ))
@@ -166,6 +169,8 @@ def print_input_values(n_clicks, data):
         for key, value in data.items():
             print(f'Value for {key}: {value}')
     return None
+
+
 
 
 if __name__ == '__main__':
