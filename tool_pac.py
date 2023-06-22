@@ -87,9 +87,11 @@ app.layout = html.Div([
             id='multi-dropdown',
             multi=True
         ),
-        html.Table(id='my-table', children=[]),
         
-        
+        #Tabella per pesi portafoglio
+        html.Table(id='my-table', children=[], style={'margin-top':'10px'}),
+
+   
         #Tabella input e dettaglio
         html.Div([
         html.Table([
@@ -220,7 +222,8 @@ def update_table(selected_values, _):
         return []
     else:
         # Crea una lista di html.Tr per ciascun valore selezionato
-        rows = []
+        rows = [html.H2('Selezionare pesi del portafoglio', 
+                 style={'margin-top':'0px','color': 'black', 'font-weight': 'normal','font-size': '1.85vh', 'margin-left': '0px','margin-bottom':'20px', 'justify-content': 'center'})]
         for value in selected_values:
             row = html.Tr(children=[
                 html.Td(children=value),
