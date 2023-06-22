@@ -17,10 +17,10 @@ import dash_bootstrap_components as dbc
 from PIL import Image
 from io import BytesIO
 import requests
-#%%
-
-
 import random
+
+#%% CALCOLI INIZIALI
+
 
 def generate_data(value):
     # Genera una lista di 100 numeri casuali tra 0 e 100 per l'asse x
@@ -29,6 +29,42 @@ def generate_data(value):
     y = [random.uniform(0, 100) for _ in range(100)]
     return {'x': x, 'y': y}
 
+
+#decodifiche FONDO - SGR
+codifiche = pd.read_excel("codifiche.xlsx", index_col=0)
+SGR = codifiche['SGR'].unique()
+
+
+
+
+#FONDI DA INSIERIRE NEL MULTIDROPDOWN
+df_options = pd.DataFrame({
+    'OptionID': SGR,
+    'OptionLabel': SGR,
+})
+
+df_suboptions = pd.DataFrame({
+    'OptionID': codifiche['SGR'],
+    'SubOptionLabel': codifiche['FONDO'],
+    'SubOptionValue': codifiche['FONDO'],
+})
+
+
+# Opzioni per il menu a discesa di base
+basic_options = {}
+for _, row in df_options.iterrows():
+    option_id = row['OptionID']
+    option_label = row['OptionLabel']
+    suboptions = df_suboptions[df_suboptions['OptionID'] == option_id]
+    basic_options[option_label] = [{'label': r['SubOptionLabel'], 'value': r['SubOptionValue']} for _, r in suboptions.iterrows()]
+
+
+
+
+
+
+
+#%% DASHBOARD
 
 app = dash.Dash(__name__, 
                 title ='Tool PAC')
@@ -59,30 +95,24 @@ app.index_string = '''
     </html>
 '''
 
-# Opzioni per il menu a discesa di base
-basic_options = {
-    'Opzione 1': [{'label': 'Sotto-opzione 1.1', 'value': '1.1'}, {'label': 'Sotto-opzione 1.2', 'value': '1.2'}],
-    'Opzione 2': [{'label': 'Sotto-opzione 2.1', 'value': '2.1'}, {'label': 'Sotto-opzione 2.2', 'value': '2.2'}],
-    'Opzione 3': [{'label': 'Sotto-opzione 3.1', 'value': '3.1'}, {'label': 'Sotto-opzione 3.2', 'value': '3.2'}, {'label': 'Sotto-opzione 55', 'value': '44'}, {'label': 'Sotto-opzione 23', 'value': '23'}, {'label': 'Sotto-opzione 12', 'value': '89'}],
-}
 
 
 # Define app layout
 app.layout = html.Div([
   
-    #TITOLO   
+        #TITOLO   
         html.Div(html.H1('Tool PAC'), style={'margin-left': '20px', 'justify-content': 'center','display': 'flex', 'align-items': 'flex-end'}),
         html.Div(html.H2('Engineered by Monitoraggio & Analisi Prodotti di Investimento', 
                  style={'margin-top':'-10px','color': 'black', 'font-style': 'italic', 'font-weight': 'normal','font-size': '1.85vh', 'margin-left': '0px','margin-bottom':'20px', 'justify-content': 'center'}),
                  style={'margin-left': '20px', 'justify-content': 'center','display': 'flex', 'align-items': 'flex-end'}),
         
-    #Selezione prodotti    
+        #SELEZIONE PRODOTTI   
         dcc.Dropdown(
             id='basic-dropdown',
             options=[{'label': key, 'value': key} for key in basic_options.keys()],
             value='Opzione 1'  # valore iniziale
         ),
-        #Selezione fondi 
+        #SELEZIONE FONDI
         dcc.Dropdown(
             id='multi-dropdown',
             multi=True
