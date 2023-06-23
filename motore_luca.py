@@ -254,11 +254,31 @@ quote['MAX DD'] = quote['CTV_NETTO'] / quote['MOVIMENTO_NETTO'].cumsum() - 1
 
 volatilita = quote['CTV Complessivo'].resample('M').last().pct_change()
 
-volatilita["Volatilita change"] = volatilita.pct_change()
-
+# quote.to_excel('prova.xlsx', index=True)
 
 ## %% 
 
 
+numero_rate
 
-quote.to_excel('prova.xlsx', index=True)
+importo_rata
+
+totale_rate_versate = sum(quote['Movimenti'])
+
+patrimonio_finale = quote['CTV_NETTO'].iloc[-1]
+
+
+plus = patrimonio_finale - totale_rate_versate
+
+
+mwrr = plus / (sum(quote['Numeri']) / (quote.index[-1] - quote.index[0]).days)
+
+
+mwrr_annualizzato = ((1 + mwrr) ** (365 / (quote.index[-1] - quote.index[0]).days)) - 1
+
+
+volatilita_finale = np.std(volatilita) * np.sqrt(12)
+
+
+max_dd = min(quote['MAX DD'])
+
