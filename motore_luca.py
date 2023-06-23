@@ -6,31 +6,15 @@ import os
 folder_path = r"C:\Users\Dionisie.Turcanu\Documents\GitHub\Dashboard_PAC"
 os.chdir(folder_path)
 
-quote = pd.read_excel('DB_TOT_PROXY.xlsx', index_col=0)
-
-quote = quote["IE0004878744"]
+base_dati = pd.read_excel('DB_TOT_PROXY.xlsx', index_col=0)
 
 
 
-# giorno in cui parte la rata è sempre un 8/28 di ogni mese. Se il giorno in cui deve partire la rata è un festivo, la rata parte il primo giorno lavorativo disponibile
-
-# frequenza: mensile, bimestrale, trimestrale, quadrimestrale, semestrale, annuale
-
-#le prime 12 rate vengono pagate il giorno della sottoscrizione, pago tutto subito
-
-# il primo giorno utile 8/28 faccio partire la rata e la successiva la faccio partire a seconda della cadenza che ha scelto
-# se è il giorno stesso allora la faccio partire dal mese dopo il primo giorno dispobibile
-
-
-#sto parlando dei costi di sottoscrizione che pago sul totale (iniziale + rate)
-# il 33% dei costi lo pago sul primo versamento
-# il 19% sulle successive 6 rate e 48% su tutto il resto
-# di 26k il 3% sono 792 di costi che si ripartono come scritto
-#con la deroga totale sconto tutti e 3 le ripartizioni
-#con la deroga iniziale sconto solo il 33% sul primo versamento
 
 
 # %% PARAMETRI
+
+quote = base_dati["IE0004878744"]
 
 numero_rate = 120
 
@@ -39,18 +23,28 @@ importo_rata = 200
 #escluso versamento iniziale
 importo_totale = numero_rate * importo_rata
 
+
+
+
+
+
 investimento_iniziale = importo_rata * 12
 
 
 costo_sottoscrizione = 0.03
+diritto_fisso_iniziale = 2.4
+diritto_fisso = 1.54
 
 
-diritto_fisso = 0.024
+importo_costo_sottoscrizione = costo_sottoscrizione * (importo_totale + investimento_iniziale)
+
+prima_fetta = importo_costo_sottoscrizione * 0.33
+seconda_fetta = importo_costo_sottoscrizione * 0.19
+terza_fetta = importo_costo_sottoscrizione * 0.48
 
 
 # %% MOVIMENTI
 
-type(quote.index[0])
 
 
 giorno_del_mese = 8  # Scegli tra 8 e 28
@@ -112,14 +106,6 @@ quote = pd.concat([quote, movimenti], axis=1)
 # %% COSTI UP1
 
 
-
-importo_costo_sottoscrizione = costo_sottoscrizione * (importo_totale + investimento_iniziale)
-
-prima_fetta = importo_costo_sottoscrizione * 0.33
-seconda_fetta = importo_costo_sottoscrizione * 0.19
-terza_fetta = importo_costo_sottoscrizione * 0.48
-
-
 # Crea una nuova colonna "COSTI UP1" con tutti valori NaN
 quote['COSTI UP1'] = np.nan
 
@@ -145,8 +131,7 @@ for i in range(7, len(movimenti_index)):
 # %% COSTI UP2
 
 # Definisci le variabili
-diritto_fisso_iniziale = 2.4
-diritto_fisso = 1.54
+
 
 # Crea una nuova colonna "COSTI UP3" con tutti valori NaN
 quote['COSTI UP3'] = np.nan
