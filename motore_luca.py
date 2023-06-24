@@ -17,16 +17,41 @@ base_dati = pd.read_excel('DB_TOT_PROXY.xlsx', index_col=0)
 quote = base_dati["IE0004878744"]
 
 
-numero_rate = 120
 
+giorno_del_mese = 8  # Scegli tra 8 e 28
+
+
+# Mappa la frequenza a un numero di mesi
+frequenze = {
+    'Mensile': 1,
+    'Bimestrale': 2,
+    'Trimestrale': 3,
+    'Quadrimestrale': 4,
+    'Semestrale': 6,
+    'Annuale': 12,
+}
+
+
+
+#ogni quanti mesi investe
+frequenza = 'Bimestrale'  # Scegli tra: 'Mensile', 'Bimestrale', 'Trimestrale', 'Quadrimestrale', 'Semestrale', 'Annuale'
+num_mesi = frequenze[frequenza]
+
+
+durata_anni = 10
 importo_rata = 200
+numero_rate = (12 / num_mesi) * durata_anni
+
+
+
+importo_rata_mensile = (importo_rata * (12 / num_mesi) * durata_anni) / (durata_anni * 12)
+investimento_iniziale = importo_rata_mensile * 12
+
+
 
 #escluso versamento iniziale
 importo_totale = numero_rate * importo_rata
 
-
-
-investimento_iniziale = importo_rata * 12
 
 
 costo_sottoscrizione = 0.03
@@ -45,20 +70,6 @@ terza_fetta = importo_costo_sottoscrizione * 0.48
 
 
 
-giorno_del_mese = 8  # Scegli tra 8 e 28
-frequenza = 'Mensile'  # Scegli tra: 'Mensile', 'Bimestrale', 'Trimestrale', 'Quadrimestrale', 'Semestrale', 'Annuale'
-
-# Mappa la frequenza a un numero di mesi
-frequenze = {
-    'Mensile': 1,
-    'Bimestrale': 2,
-    'Trimestrale': 3,
-    'Quadrimestrale': 4,
-    'Semestrale': 6,
-    'Annuale': 12,
-}
-
-num_mesi = frequenze[frequenza]
 
 # Crea un nuovo DataFrame per i movimenti
 movimenti = pd.DataFrame(index=quote.index)
@@ -234,12 +245,7 @@ quote['MAX DD'] = quote['CTV_NETTO'] / quote['MOVIMENTO_NETTO'].cumsum() - 1
 
 # %%
 
-
 volatilita = quote['CTV Complessivo'].resample('M').last().pct_change()
-
-# quote.to_excel('prova.xlsx', index=True)
-
-## %% 
 
 
 numero_rate
@@ -266,3 +272,8 @@ volatilita_finale = np.std(volatilita) * np.sqrt(12)
 
 max_dd = min(quote['MAX DD'])
 
+
+
+#output su excel
+quote = quote.replace(0, np.nan)
+quote.to_excel("prova.xlsx", index=True)
