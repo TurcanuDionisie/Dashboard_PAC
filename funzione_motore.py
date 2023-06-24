@@ -32,10 +32,10 @@ def financial_analysis(quote, giorno_del_mese, frequenza, durata_anni, importo_r
     importo_totale = numero_rate * importo_rata
 
     costo_sottoscrizione = 0.03
-    diritto_fisso_iniziale = 2.4
-    diritto_fisso = 1.54
+    diritto_fisso_iniziale = 2.4 * 0.3
+    diritto_fisso = 1.54 * 0.3
 
-    importo_costo_sottoscrizione = costo_sottoscrizione * (importo_totale + investimento_iniziale)
+    importo_costo_sottoscrizione = costo_sottoscrizione * (importo_totale + investimento_iniziale) * 0.3
 
     prima_fetta = importo_costo_sottoscrizione * 0.33
     seconda_fetta = importo_costo_sottoscrizione * 0.19
@@ -162,7 +162,7 @@ quote = base_dati["IE0004878744"]
 giorno_del_mese = 8
 frequenza = 'Mensile'
 durata_anni = 10
-importo_rata = 200
+importo_rata = 200 * 0.3
 
 
 hh = financial_analysis(quote, giorno_del_mese, frequenza, durata_anni, importo_rata)

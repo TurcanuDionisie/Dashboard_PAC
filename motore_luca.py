@@ -17,6 +17,15 @@ base_dati = pd.read_excel('DB_TOT_PROXY.xlsx', index_col=0)
 quote = base_dati["IE0004878744"]
 
 
+#da 0 a 1
+peso = 1
+costo_sottoscrizione = 0.03
+diritto_fisso_iniziale = 2.4 * peso
+diritto_fisso = 1.54 * peso
+
+
+
+
 
 giorno_del_mese = 8  # Scegli tra 8 e 28
 
@@ -34,17 +43,18 @@ frequenze = {
 
 
 #ogni quanti mesi investe
-frequenza = 'Bimestrale'  # Scegli tra: 'Mensile', 'Bimestrale', 'Trimestrale', 'Quadrimestrale', 'Semestrale', 'Annuale'
+frequenza = 'Mensile'  # Scegli tra: 'Mensile', 'Bimestrale', 'Trimestrale', 'Quadrimestrale', 'Semestrale', 'Annuale'
 num_mesi = frequenze[frequenza]
 
 
 durata_anni = 10
-importo_rata = 200
+importo_rata = 200 * peso
 numero_rate = (12 / num_mesi) * durata_anni
 
 
 
 importo_rata_mensile = (importo_rata * (12 / num_mesi) * durata_anni) / (durata_anni * 12)
+
 investimento_iniziale = importo_rata_mensile * 12
 
 
@@ -52,11 +62,6 @@ investimento_iniziale = importo_rata_mensile * 12
 #escluso versamento iniziale
 importo_totale = numero_rate * importo_rata
 
-
-
-costo_sottoscrizione = 0.03
-diritto_fisso_iniziale = 2.4
-diritto_fisso = 1.54
 
 
 importo_costo_sottoscrizione = costo_sottoscrizione * (importo_totale + investimento_iniziale)
