@@ -17,13 +17,20 @@ base_dati = pd.read_excel('DB_TOT_PROXY.xlsx', index_col=0)
 quote = base_dati["IE0004878744"]
 
 
+#peso dentro il portafolgio
 #da 0 a 1
-peso = 1
+peso = 0.3
+
+
 costo_sottoscrizione = 0.03
 diritto_fisso_iniziale = 2.4 * peso
 diritto_fisso = 1.54 * peso
 
 
+#1 = 0% sconto
+#0 = 100% sconto
+deroga_totale = 1
+deroga_iniziale = 0.5
 
 
 
@@ -66,9 +73,9 @@ importo_totale = numero_rate * importo_rata
 
 importo_costo_sottoscrizione = costo_sottoscrizione * (importo_totale + investimento_iniziale)
 
-prima_fetta = importo_costo_sottoscrizione * 0.33
-seconda_fetta = importo_costo_sottoscrizione * 0.19
-terza_fetta = importo_costo_sottoscrizione * 0.48
+prima_fetta = importo_costo_sottoscrizione * 0.33 * deroga_totale * deroga_iniziale
+seconda_fetta = importo_costo_sottoscrizione * 0.19 * deroga_totale
+terza_fetta = importo_costo_sottoscrizione * 0.48* deroga_totale
 
 
 # %% MOVIMENTI
