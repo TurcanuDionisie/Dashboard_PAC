@@ -16,15 +16,13 @@ base_dati = pd.read_excel('DB_TOT_PROXY.xlsx', index_col=0)
 
 quote = base_dati["IE0004878744"]
 
+
 numero_rate = 120
 
 importo_rata = 200
 
 #escluso versamento iniziale
 importo_totale = numero_rate * importo_rata
-
-
-
 
 
 
@@ -263,6 +261,7 @@ mwrr_annualizzato = ((1 + mwrr) ** (365 / (quote.index[-1] - quote.index[0]).day
 
 
 volatilita_finale = np.std(volatilita) * np.sqrt(12)
+
 
 
 max_dd = min(quote['MAX DD'])
