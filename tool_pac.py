@@ -158,6 +158,17 @@ app.layout = html.Div([
     ),
     
     
+    #frequenza
+    dcc.Dropdown(
+    id='durata', 
+    options=[
+            {'label': '10 Anni', 'value': '10'},
+            {'label': '15 Anni', 'value': '15'},
+        ],
+    value='10',  # Puoi impostare il valore predefinito qui
+    ),
+    
+    
     html.Button('Stampa valori', id='calcola', n_clicks=0),  # aggiungi il pulsante
     html.Div(id='error-message')
 ])
@@ -219,13 +230,14 @@ def update_table(selected_values, data):
     [Input('calcola', 'n_clicks'),
      Input('data-inizio', 'value'),
      Input('importo-rata', 'value'),
-     Input('frequenza', 'value')
+     Input('frequenza', 'value'),
+     Input('durata', 'value')
      ],
     [State('store-inputs', 'data'),
      ]
 )
 
-def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, pesi):
+def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, pesi):
     
     message = ""
     
@@ -236,6 +248,9 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, pesi):
         print(importo_rata)
         
         print(frequenza)
+        
+        print(durata)
+        
         
         #controlla che i pesi inseriti siano giusti
         if(funzioni_pac.controlloSommaPesi(pesi)):
