@@ -64,7 +64,11 @@ for _, row in df_options.iterrows():
 
 
 
+#lettura quote
 
+
+quote = pd.read_excel("DB_TOT_PROXY.xlsx", index_col=0)
+datetime_index = quote.index
 
 
 #%% DASHBOARD
@@ -112,9 +116,18 @@ app.layout = html.Div([
         multi=True
     ),
     html.Table(id='my-table', children=[]),
-    html.Button('Stampa valori', id='print-button', n_clicks=0),  # aggiungi il pulsante
     html.Div(id='dummy-output'),  # componente "dummy" usato per il callback del pulsante
     dcc.Store(id='store-inputs', data={}),  # componente di storage per conservare i valori di input
+    
+    
+    dcc.Dropdown(
+        id='data-inizio',
+        options=[{'label': str(date), 'value': str(date)} for date in datetime_index],
+        value=None
+    ),
+    
+    
+    html.Button('Stampa valori', id='calcola', n_clicks=0),  # aggiungi il pulsante
     html.Div(id='error-message')
 ])
 
@@ -172,19 +185,23 @@ def update_table(selected_values, data):
     [Output('dummy-output', 'children'),
      Output('error-message', 'children'),   
      ],
-    [Input('print-button', 'n_clicks')],
-    [State('store-inputs', 'data')]
+    [Input('calcola', 'n_clicks'),
+     Input('data-inizio', 'value')],
+    [State('store-inputs', 'data'),
+     ]
 )
 
-def print_input_values(n_clicks, data):
+def print_input_values(n_clicks, data_inizio, pesi):
     
     message = ""
     
     if n_clicks > 0:
         
+        print(data_inizio)
+        
         #controlla che i pesi inseriti siano giusti
-        if(funzioni_pac.controlloSommaPesi(data)):
-            print(data)
+        if(funzioni_pac.controlloSommaPesi(pesi)):
+            print(pesi)
             
         else:
             message = "Errori nei pesi"
