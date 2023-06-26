@@ -120,10 +120,19 @@ app.layout = html.Div([
     dcc.Store(id='store-inputs', data={}),  # componente di storage per conservare i valori di input
     
     
+    #data inizio
     dcc.Dropdown(
         id='data-inizio',
         options=[{'label': str(date), 'value': str(date)} for date in datetime_index],
         value=None
+    ),
+    
+    
+    #importo rata
+    dcc.Input(
+    id='importo-rata',
+    type='text',
+    placeholder='Importo rata'
     ),
     
     
@@ -186,18 +195,21 @@ def update_table(selected_values, data):
      Output('error-message', 'children'),   
      ],
     [Input('calcola', 'n_clicks'),
-     Input('data-inizio', 'value')],
+     Input('data-inizio', 'value'),
+     Input('importo-rata', 'value')],
     [State('store-inputs', 'data'),
      ]
 )
 
-def print_input_values(n_clicks, data_inizio, pesi):
+def print_input_values(n_clicks, data_inizio, importo_rata, pesi):
     
     message = ""
     
     if n_clicks > 0:
         
         print(data_inizio)
+        
+        print(importo_rata)
         
         #controlla che i pesi inseriti siano giusti
         if(funzioni_pac.controlloSommaPesi(pesi)):
