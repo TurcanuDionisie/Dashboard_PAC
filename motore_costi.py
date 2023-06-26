@@ -57,14 +57,12 @@ pesi = {
 
 importo_rata = 500
 durata_anni = 10
-
-#ogni quanti mesi investe
 frequenza = 'Mensile'  # Scegli tra: 'Mensile', 'Bimestrale', 'Trimestrale', 'Quadrimestrale', 'Semestrale', 'Annuale'
+
+
+
+
 num_mesi = frequenze[frequenza]
-
-
-
-
 
 numero_rate = (12 / num_mesi) * durata_anni
 
