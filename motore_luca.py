@@ -19,7 +19,7 @@ quote = base_dati["IE0004878744"]
 
 #peso dentro il portafolgio
 #da 0 a 1
-peso = 0.3
+peso = 1
 
 
 costo_sottoscrizione = 0.03
@@ -30,7 +30,7 @@ diritto_fisso = 1.54 * peso
 #1 = 0% sconto
 #0 = 100% sconto
 deroga_totale = 1
-deroga_iniziale = 0.5
+deroga_iniziale = 1
 
 
 

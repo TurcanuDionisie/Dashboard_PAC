@@ -19,6 +19,9 @@ from io import BytesIO
 import requests
 import random
 
+
+import funzioni_pac
+
 #%% CALCOLI INIZIALI
 
 
@@ -32,7 +35,7 @@ def generate_data(value):
 
 #decodifiche FONDO - SGR
 codifiche = pd.read_excel("codifiche.xlsx", index_col=0)
-SGR = codifiche['SGR'].unique()
+SGR = codifiche['FAMIGLIA'].unique()
 
 
 
@@ -44,9 +47,9 @@ df_options = pd.DataFrame({
 })
 
 df_suboptions = pd.DataFrame({
-    'OptionID': codifiche['SGR'],
-    'SubOptionLabel': codifiche['FONDO'],
-    'SubOptionValue': codifiche['FONDO'],
+    'OptionID': codifiche['FAMIGLIA'],
+    'SubOptionLabel': codifiche.index,
+    'SubOptionValue': codifiche.index,
 })
 
 
@@ -111,8 +114,13 @@ app.layout = html.Div([
     html.Table(id='my-table', children=[]),
     html.Button('Stampa valori', id='print-button', n_clicks=0),  # aggiungi il pulsante
     html.Div(id='dummy-output'),  # componente "dummy" usato per il callback del pulsante
-    dcc.Store(id='store-inputs', data={})  # componente di storage per conservare i valori di input
+    dcc.Store(id='store-inputs', data={}),  # componente di storage per conservare i valori di input
+    html.Div(id='error-message')
 ])
+
+
+
+
 
 # Aggiungi un callback per ogni input generato dinamicamente
 @app.callback(
@@ -158,17 +166,32 @@ def update_table(selected_values, data):
             rows.append(row)
         return rows
 
+
 # Stampare i valori quando si preme il pulsante
 @app.callback(
-    Output('dummy-output', 'children'),
+    [Output('dummy-output', 'children'),
+     Output('error-message', 'children'),   
+     ],
     [Input('print-button', 'n_clicks')],
     [State('store-inputs', 'data')]
 )
+
 def print_input_values(n_clicks, data):
+    
+    message = ""
+    
     if n_clicks > 0:
-        for key, value in data.items():
-            print(f'Value for {key}: {value}')
-    return None
+        
+        #controlla che i pesi inseriti siano giusti
+        if(funzioni_pac.controlloSommaPesi(data)):
+            print(data)
+            
+        else:
+            message = "Errori nei pesi"
+            
+            
+    
+    return None, message
 
 
 
