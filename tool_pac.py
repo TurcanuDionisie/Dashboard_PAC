@@ -85,6 +85,21 @@ frequenze = {
 
 
 
+
+selezione_deroga = {
+    'Nessuna': 'Nessuna',
+    'Iniziale 25%': 'Iniziale 25%',
+    'Iniziale 50%': 'Iniziale 50%',
+    'Iniziale 75%': 'Iniziale 75%',
+    'Iniziale 100%': 'Iniziale 75%',
+    'Totale 25%': 'Totale 25%',
+    'Totale 50%': 'Iniziale 50%',
+    'Totale 75%': 'Iniziale 75%',
+    'Totale 100%': 'Iniziale 75%',
+}
+
+
+
 #%% DASHBOARD
 
 app = dash.Dash(__name__, 
@@ -158,7 +173,7 @@ app.layout = html.Div([
     ),
     
     
-    #frequenza
+    #durata
     dcc.Dropdown(
     id='durata', 
     options=[
@@ -166,6 +181,14 @@ app.layout = html.Div([
             {'label': '15 Anni', 'value': '15'},
         ],
     value='10',  # Puoi impostare il valore predefinito qui
+    ),
+    
+    
+    #data inizio
+    dcc.Dropdown(
+        id='deroga',
+        options=[{'label': str(deroga), 'value': str(deroga)} for deroga in selezione_deroga],
+        value='Nessuna'
     ),
     
     
@@ -231,13 +254,14 @@ def update_table(selected_values, data):
      Input('data-inizio', 'value'),
      Input('importo-rata', 'value'),
      Input('frequenza', 'value'),
-     Input('durata', 'value')
+     Input('durata', 'value'),
+     Input('deroga', 'value')
      ],
     [State('store-inputs', 'data'),
      ]
 )
 
-def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, pesi):
+def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, deroga, pesi):
     
     message = ""
     
@@ -250,6 +274,8 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, p
         print(frequenza)
         
         print(durata)
+        
+        print(deroga)
         
         
         #controlla che i pesi inseriti siano giusti
