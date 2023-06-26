@@ -75,7 +75,7 @@ importo_costo_sottoscrizione = costo_sottoscrizione * (importo_totale + investim
 
 prima_fetta = importo_costo_sottoscrizione * 0.33 * deroga_totale * deroga_iniziale
 seconda_fetta = importo_costo_sottoscrizione * 0.19 * deroga_totale
-terza_fetta = importo_costo_sottoscrizione * 0.48* deroga_totale
+terza_fetta = importo_costo_sottoscrizione * 0.48 * deroga_totale
 
 
 # %% MOVIMENTI

@@ -31,20 +31,9 @@ def fasciaCostiSottoscrizione(importo_iniziale, dataframe):
 
 
 
-#%% INPUT
+#%% INIZIALIZZAZIONE
 
 costi = pd.read_excel('costi.xlsx', index_col=0)
-
-
-pesi = {
-    "IE0004457085": 0.40,
-    "IE0004460683": 0.60,
-}
-
-
-importo_rata = 2000
-
-durata_anni = 10
 
 
 # Mappa la frequenza a un numero di mesi
@@ -58,27 +47,33 @@ frequenze = {
 }
 
 
+# %% INPUT
+
+pesi = {
+    "IT0005066896": 0.40,
+    "IT0005066938": 0.60,
+}
+
+
+importo_rata = 500
+durata_anni = 10
 
 #ogni quanti mesi investe
 frequenza = 'Mensile'  # Scegli tra: 'Mensile', 'Bimestrale', 'Trimestrale', 'Quadrimestrale', 'Semestrale', 'Annuale'
 num_mesi = frequenze[frequenza]
 
 
+
+
+
 numero_rate = (12 / num_mesi) * durata_anni
-
-
 
 importo_rata_mensile = (importo_rata * (12 / num_mesi) * durata_anni) / (durata_anni * 12)
 
 investimento_iniziale = importo_rata_mensile * 12
 
-
-
 #escluso versamento iniziale
 importo_totale = numero_rate * importo_rata
-
-
-
 
 # %% CALCOLA IMPORTO MINIMO
 
@@ -105,9 +100,6 @@ if(len(importo_fondi) > 1):
             print("Errore importo minimo " + isin)
 
 
-print("(ESCLUSO VERSAMENTO INIZIALE) IL cliente verserà in totale " + str(importo_totale))
-
-
 
 # %% CALCOLA COSTI SOTTOSCRIZIONE
 
@@ -119,7 +111,7 @@ importo_totale = importo_totale + investimento_iniziale
 #prendo un isin a caso della categoria, tanto hanno tutti lo stesso costo
 #passo in input il costo totale della categoria
 #ritorna costi in percentuale
-isin = "IE0004457085"
+isin = "IT0005066896"
 costi_sottoscrizione = costi[fasciaCostiSottoscrizione(importo_totale, costi.loc[isin])].loc[isin]
 
 
@@ -128,20 +120,19 @@ costi_sottoscrizione = costi[fasciaCostiSottoscrizione(importo_totale, costi.loc
 # %% CALCOLA DIRITTI FISSI
 
 
-fascia_diritti_fissi_iniziale = fasciaDirittiFissi(investimento_iniziale, costi.loc[isin])
+#Valore in euro
+costi_diritti_fissi_iniziale = costi["DIRITTO_FISSO"].loc[isin]
+
+
+
+fascia_diritti_fissi_costanti = fasciaDirittiFissi(investimento_iniziale, costi.loc[isin])
 
 #costi diritti fissi in euro
-costi_diritti_fissi = costi[fascia_diritti_fissi_iniziale].loc[isin]
+costi_diritti_fissi_costanti = costi[fascia_diritti_fissi_costanti].loc[isin]
 
 #unico caso particolare dove il costo è in percentuale
-if (costi_diritti_fissi == 0.001):
-    costi_diritti_fissi = investimento_iniziale * costi_diritti_fissi
+if (costi_diritti_fissi_costanti == 0.001):
+    costi_diritti_fissi_costanti = investimento_iniziale * costi_diritti_fissi_costanti
 
 
-print("IMPORTO RATE: " + str(importo_rata))
-print("DIRITTO FISSO: " + str(costi["DIRITTO_FISSO"].loc[isin]))
-print("FASCIA: " + str(fascia_diritti_fissi_iniziale))
-print("RANGE MIN: " + str(costi[fascia_diritti_fissi_iniziale + "_MIN"].loc[isin]))
-print("RANGE MIN: " + str(costi[fascia_diritti_fissi_iniziale + "_MAX"].loc[isin]))
-print("DIRITTI INIZIALI: " + str(costi_diritti_fissi))
 
