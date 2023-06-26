@@ -65,10 +65,24 @@ for _, row in df_options.iterrows():
 
 
 #lettura quote
-
-
 quote = pd.read_excel("DB_TOT_PROXY.xlsx", index_col=0)
+
+
+#data inizio
 datetime_index = quote.index
+
+
+
+
+frequenze = {
+    'Mensile': 'Mensile',
+    'Bimestrale': 'Bimestrale',
+    'Trimestrale': 'Trimestrale',
+    'Quadrimestrale': 'Quadrimestrale',
+    'Semestrale': 'Semestrale',
+    'Annuale': 'Annuale'
+}
+
 
 
 #%% DASHBOARD
@@ -136,6 +150,14 @@ app.layout = html.Div([
     ),
     
     
+    #frequenza
+    dcc.Dropdown(
+    id='frequenza', 
+    options=[{'label': label, 'value': value} for label, value in frequenze.items()],
+    value='Mensile',  # Puoi impostare il valore predefinito qui
+    ),
+    
+    
     html.Button('Stampa valori', id='calcola', n_clicks=0),  # aggiungi il pulsante
     html.Div(id='error-message')
 ])
@@ -196,12 +218,14 @@ def update_table(selected_values, data):
      ],
     [Input('calcola', 'n_clicks'),
      Input('data-inizio', 'value'),
-     Input('importo-rata', 'value')],
+     Input('importo-rata', 'value'),
+     Input('frequenza', 'value')
+     ],
     [State('store-inputs', 'data'),
      ]
 )
 
-def print_input_values(n_clicks, data_inizio, importo_rata, pesi):
+def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, pesi):
     
     message = ""
     
@@ -210,6 +234,8 @@ def print_input_values(n_clicks, data_inizio, importo_rata, pesi):
         print(data_inizio)
         
         print(importo_rata)
+        
+        print(frequenza)
         
         #controlla che i pesi inseriti siano giusti
         if(funzioni_pac.controlloSommaPesi(pesi)):
