@@ -37,8 +37,8 @@ costi = pd.read_excel('costi.xlsx', index_col=0)
 
 
 pesi = {
-    "IE0004621052": 0.40,
-    "IE0004879379": 0.60,
+    "IE0004457085": 0.40,
+    "IE0004460683": 0.60,
 }
 
 
@@ -46,27 +46,54 @@ importo_rata = 2000
 
 durata_anni = 10
 
-#paga 2 volte all'anno (frequenza semestrale)
-frequenza = 2
+
+# Mappa la frequenza a un numero di mesi
+frequenze = {
+    'Mensile': 1,
+    'Bimestrale': 2,
+    'Trimestrale': 3,
+    'Quadrimestrale': 4,
+    'Semestrale': 6,
+    'Annuale': 12,
+}
 
 
-importo_totale_ex_iniziale = importo_rata * frequenza * durata_anni
 
-importo_mensile = importo_totale_ex_iniziale / (durata_anni * 12)
+#ogni quanti mesi investe
+frequenza = 'Mensile'  # Scegli tra: 'Mensile', 'Bimestrale', 'Trimestrale', 'Quadrimestrale', 'Semestrale', 'Annuale'
+num_mesi = frequenze[frequenza]
+
+
+numero_rate = (12 / num_mesi) * durata_anni
+
+
+
+importo_rata_mensile = (importo_rata * (12 / num_mesi) * durata_anni) / (durata_anni * 12)
+
+investimento_iniziale = importo_rata_mensile * 12
+
+
+
+#escluso versamento iniziale
+importo_totale = numero_rate * importo_rata
+
+
 
 
 # %% CALCOLA IMPORTO MINIMO
 
 
-if(importo_mensile < 150):
-    print("Errore importo minimo mensile: " + str(importo_mensile))
+# per qualsiasi fondo la rata minima deve essere di 150
+if(importo_rata_mensile < 150):
+    print("Errore importo minimo mensile: " + str(importo_rata_mensile))
+
 
 
 importo_fondi = {}
 
 
 for isin in pesi:
-   importo_fondi[isin] = pesi[isin] * importo_mensile
+   importo_fondi[isin] = pesi[isin] * importo_rata_mensile
    
 
 
@@ -78,29 +105,22 @@ if(len(importo_fondi) > 1):
             print("Errore importo minimo " + isin)
 
 
-print("(ESCLUSO VERSAMENTO INIZIALE) IL cliente verserà in totale " + str(importo_totale_ex_iniziale))
+print("(ESCLUSO VERSAMENTO INIZIALE) IL cliente verserà in totale " + str(importo_totale))
 
 
 
 # %% CALCOLA COSTI SOTTOSCRIZIONE
 
 
-#calcolo importo totale
-importo_totale = importo_totale_ex_iniziale + (importo_mensile * 12)
+#calcolo importo totale aggiungendo iporto iniziale
+importo_totale = importo_totale + investimento_iniziale
 
 
-totale_fondi = {}
-
-
-for isin in pesi:
-    totale_fondi[isin] = pesi[isin] * importo_totale
-
-
-
-costi_sottoscrizione = {}
-
-for isin in totale_fondi:
-    costi_sottoscrizione[isin] = costi[fasciaCostiSottoscrizione(totale_fondi[isin], costi.loc[isin])].loc[isin]
+#prendo un isin a caso della categoria, tanto hanno tutti lo stesso costo
+#passo in input il costo totale della categoria
+#ritorna costi in percentuale
+isin = "IE0004457085"
+costi_sottoscrizione = costi[fasciaCostiSottoscrizione(importo_totale, costi.loc[isin])].loc[isin]
 
 
 
@@ -108,10 +128,14 @@ for isin in totale_fondi:
 # %% CALCOLA DIRITTI FISSI
 
 
-fascia_diritti_fissi_iniziale = fasciaDirittiFissi(importo_iniziale, costi.loc[isin])
+fascia_diritti_fissi_iniziale = fasciaDirittiFissi(investimento_iniziale, costi.loc[isin])
 
+#costi diritti fissi in euro
 costi_diritti_fissi = costi[fascia_diritti_fissi_iniziale].loc[isin]
 
+#unico caso particolare dove il costo è in percentuale
+if (costi_diritti_fissi == 0.001):
+    costi_diritti_fissi = investimento_iniziale * costi_diritti_fissi
 
 
 print("IMPORTO RATE: " + str(importo_rata))
