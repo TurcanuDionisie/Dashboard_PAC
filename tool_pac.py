@@ -20,6 +20,14 @@ import requests
 import random
 
 
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+from dash.dependencies import Input, Output, State
+import pandas as pd
+import plotly.graph_objects as go
+
+
 import funzioni_dashboard
 import motore
 
@@ -194,6 +202,9 @@ app.layout = html.Div([
     ),
     
     
+    dcc.Graph(id='result-graph'),
+    
+        
     
     html.Button('Stampa valori', id='calcola', n_clicks=0),  # aggiungi il pulsante
     html.Div(id='error-message')
@@ -250,53 +261,25 @@ def update_table(selected_values, data):
         return rows
 
 
-# Stampare i valori quando si preme il pulsante
 @app.callback(
-    [Output('dummy-output', 'children'),
-     Output('error-message', 'children'),   
-     ],
+    [Output('result-graph', 'figure'),
+     Output('dummy-output', 'children'),
+     Output('error-message', 'children')],
     [Input('calcola', 'n_clicks'),
      Input('data-inizio', 'value'),
      Input('importo-rata', 'value'),
      Input('frequenza', 'value'),
      Input('durata', 'value'),
-     Input('deroga', 'value')
-     ],
-    [State('store-inputs', 'data'),
-     ]
+     Input('deroga', 'value')],
+    [State('store-inputs', 'data')]
 )
-
 def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, deroga, isin_selezionati):
-    
     message = ""
-    
-    if n_clicks > 0:
-        
+   
 
-        
-        
-        #controlla che i pesi inseriti siano giusti
+    if n_clicks > 0:
+
         if(funzioni_dashboard.controlloSommaPesi(isin_selezionati)):
-            
-            # print(data_inizio)
-            # print(type(data_inizio))
-            
-            # print(importo_rata)
-            # print(type(importo_rata))
-            
-            # print(frequenza)
-            # print(type(frequenza))
-            
-            
-            # print(durata)
-            # print(type(durata))
-            
-            # print(deroga)
-            # print(type(deroga))
-            
-            
-            # print(isin_selezionati)
-            # print(type(isin_selezionati))
             
             input_motore = {
                 "isin_selezionati": isin_selezionati,
@@ -307,24 +290,46 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
                 "giorno_mese":"8"
             }
             
-            
             risultati = motore.Motore(input_motore)
             
-            grafico = risultati["grafico"]
             
-            
-            print(grafico)
-            
-            
-            print("funzione lanciata")
-            
-            
+            df = risultati["grafico"]
+
+            df = pd.DataFrame({
+                'x': df.index,
+                'y1': df["CTV_NETTO"],
+                'y2': df["MOVIMENTI"]
+            })
+
+            df_bar = df.iloc[::10, :]
+
+            fig = {
+                'data': [
+                    go.Scatter(  # linea
+                        x=df['x'],
+                        y=df['y1'],
+                        mode='lines',
+                        name='Linea'
+                    ),
+                    go.Bar(  # barre
+                        x=df_bar['x'],
+                        y=df_bar['y2'],
+                        name='Barre',
+                        width=3
+                    )
+                ],
+                'layout': go.Layout(
+                    title='Linea e Barre su un Unico Grafico',
+                    xaxis={'title': 'Data'},
+                    yaxis={'title': 'Valore'}
+                )
+            }
+
         else:
             message = "Errori nei pesi"
-            
-            
-    
-    return None, message
+
+    return fig, None, message  # Returns figure to the graph, None to the 'dummy-output', and the error message to 'error-message'.
+
 
 
 
