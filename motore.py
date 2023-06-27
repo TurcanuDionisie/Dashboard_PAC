@@ -1,6 +1,14 @@
 import pandas as pd
 import numpy as np
+import os
 
+
+folder_path = r"C:\Users\Dionisie.Turcanu\Documents\GitHub\Dashboard_PAC"
+os.chdir(folder_path)
+
+
+file_decodifiche = pd.read_excel('costi.xlsx', index_col=0)
+base_dati = pd.read_excel('DB_TOT_PROXY.xlsx', index_col=0)
 
 
 def fasciaDirittiFissi(importo_iniziale, dataframe):
@@ -323,14 +331,182 @@ def calcola_performance(dati_input):
   max_dd = min(quote['MAX DD'])
   
   
-  return {
+  risultato =  {
         "Totale rate versate": totale_rate_versate,
         "patrimonio finale": patrimonio_finale,
         "plus": plus,
         "MWRR": mwrr,
         "MWRR_annualizzato": mwrr_annualizzato,
         "Volatilita_finale": volatilita_finale,
-        "Max_DD": max_dd
+        "Max_DD": max_dd,
+        "Calcoli": quote
+    }
+  
+  return risultato
+
+
+
+
+
+
+
+
+
+def GraficoPortafolgio(risultati_performance, isin, totale_dovuto):
+    df_portafolgio = pd.DataFrame(columns=risultati_performance[isin]["Calcoli"].columns, index=risultati_performance[isin]["Calcoli"].index)
+
+    df_portafolgio = df_portafolgio.fillna(0)
+
+
+    for isin in risultati_performance:
+        df_portafolgio["Movimenti"] += risultati_performance[isin]["Calcoli"]["Movimenti"]
+        df_portafolgio["MOVIMENTO_NETTO"] += risultati_performance[isin]["Calcoli"]["MOVIMENTO_NETTO"]
+        df_portafolgio["CTV_LORDO"] += risultati_performance[isin]["Calcoli"]["CTV_LORDO"]
+        df_portafolgio["CTV_NETTO"] += risultati_performance[isin]["Calcoli"]["CTV_NETTO"]
+        
+
+
+    max_date = df_portafolgio.index.max()
+
+
+    df_portafolgio['Numeri'] = df_portafolgio['Movimenti'] * (max_date - df_portafolgio.index).days
+
+
+    df_portafolgio['CTV Complessivo'] = df_portafolgio['CTV_NETTO'] + totale_dovuto - df_portafolgio['MOVIMENTO_NETTO'].cumsum()
+
+    df_portafolgio['VOL'] = df_portafolgio['CTV Complessivo'].pct_change()
+
+    df_portafolgio['MAX DD'] = df_portafolgio['CTV_NETTO'] / df_portafolgio['MOVIMENTO_NETTO'].cumsum() - 1
+    
+    
+    
+    grafico = pd.DataFrame()
+    
+    grafico["CTV_NETTO"] = df_portafolgio['CTV_NETTO']
+    grafico["MOVIMENTI"] = df_portafolgio["Movimenti"].cumsum()
+
+    
+    return grafico
+
+
+
+
+
+
+# Mappa la frequenza a un numero di mesi
+frequenze = {
+    'Mensile': 1,
+    'Bimestrale': 2,
+    'Trimestrale': 3,
+    'Quadrimestrale': 4,
+    'Semestrale': 6,
+    'Annuale': 12,
+}
+
+
+
+def Motore (input_motore):
+    
+    
+    # isin selezionati e corrispettivo peso
+    fondi = {
+        
+    }
+    
+    
+    #estrazione dati input
+    frequenza =  input_motore['frequenza']
+    importo_rata = float(input_motore['importo_rata'])
+    durata_anni = int(input_motore['durata_anni'])
+    giorno_del_mese = int(input_motore['giorno_mese'])
+    
+    #non ancora gestito
+    data_inizio = input_motore['data_inizio']
+    
+    
+    
+    #trasformo pesi dei fondi da stringhe in float
+    for isin in input_motore["isin_selezionati"]:
+        fondi[isin] = float(input_motore["isin_selezionati"][isin])
+    
+    
+    
+    num_mesi = frequenze[frequenza]
+
+    numero_rate = (12 / num_mesi) * durata_anni
+
+    importo_rata_mensile = (importo_rata * (12 / num_mesi) * durata_anni) / (durata_anni * 12)
+
+    investimento_iniziale = importo_rata_mensile * 12
+
+    #escluso versamento iniziale
+    importo_totale_rate = numero_rate * importo_rata
+
+
+    #deroga ancora da gestire
+    deroga_iniziale = 1
+    deroga_totale = 1
+    
+
+    dati_input_costi = {
+            "fondi": fondi,
+            "file_decodifiche": file_decodifiche,
+            'importo_rata_mensile': importo_rata_mensile,
+            'importo_totale_rate':importo_totale_rate,
+            'investimento_iniziale': investimento_iniziale
+    }
+    
+    
+    #calcola costi
+    costi = calcola_costi(dati_input_costi)
+
+    
+    
+    
+    
+    
+    # calcola performance per ogni fondo
+    risultati_performance = {}
+
+    for isin in fondi:
+        quote = base_dati[isin]
+        peso = fondi[isin]
+        
+        
+        dati_input_performance = {
+            
+            "quote" : quote,
+            "peso" : peso,
+            "costo_sottoscrizione" : costi["costi_sottoscrizione"],
+            "diritto_fisso_iniziale" : costi["diritti_fissi_iniziali"],
+            "diritto_fisso" : costi["diritti_fissi"],
+            "deroga_totale" : deroga_totale,
+            "deroga_iniziale" : deroga_iniziale,
+            "num_mesi" : num_mesi,
+            "giorno_del_mese" : giorno_del_mese,
+            "numero_rate" : numero_rate,
+            "importo_rata_mensile" : importo_rata_mensile,
+            "importo_rata" : importo_rata,
+            "importo_totale_rate" : importo_totale_rate,
+            "investimento_iniziale" : investimento_iniziale
+        
+        }
+        
+        
+        risultati_performance[isin] = calcola_performance(dati_input_performance)
+    
+    
+    
+    grafico = GraficoPortafolgio(risultati_performance, isin, (importo_totale_rate + investimento_iniziale))
+    
+    
+    risultati = {
+        
+        "grafico": grafico
+        
     }
 
-
+    
+    return risultati
+    
+    

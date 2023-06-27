@@ -32,7 +32,8 @@ frequenze = {
 
 # isin selezionati e corrispettivo peso
 fondi = {
-    "IE0004878744": 1,
+    "IE0004878744": 0.5,
+    "IE0004460683": 0.5
 }
 
 
@@ -81,6 +82,9 @@ costi = calcola_costi(dati_input)
 # %% CALCOLA PERFORMANCE
 
 
+
+risultati_performance = {}
+
 for isin in fondi:
     quote = base_dati[isin]
     peso = fondi[isin]
@@ -102,11 +106,40 @@ for isin in fondi:
         "importo_rata" : importo_rata,
         "importo_totale_rate" : importo_totale_rate,
         "investimento_iniziale" : investimento_iniziale
-        
         }
     
     
-    print(calcola_performance(dati_input))
+    
+    risultati_performance[isin] = calcola_performance(dati_input)
+    
+
+
+df_portafolgio = pd.DataFrame(columns=risultati_performance[isin]["Calcoli"].columns, index=risultati_performance[isin]["Calcoli"].index)
+
+df_portafolgio = df_portafolgio.fillna(0)
+
+
+for isin in risultati_performance:
+    df_portafolgio["Movimenti"] += risultati_performance[isin]["Calcoli"]["Movimenti"]
+    df_portafolgio["MOVIMENTO_NETTO"] += risultati_performance[isin]["Calcoli"]["MOVIMENTO_NETTO"]
+    df_portafolgio["CTV_LORDO"] += risultati_performance[isin]["Calcoli"]["CTV_LORDO"]
+    df_portafolgio["CTV_NETTO"] += risultati_performance[isin]["Calcoli"]["CTV_NETTO"]
+    
+
+
+max_date = quote.index.max()
+
+
+df_portafolgio['Numeri'] = df_portafolgio['Movimenti'] * (max_date - df_portafolgio.index).days
+
+totale_dovuto = importo_totale_rate + investimento_iniziale
+
+df_portafolgio['CTV Complessivo'] = df_portafolgio['CTV_NETTO'] + totale_dovuto - df_portafolgio['MOVIMENTO_NETTO'].cumsum()
+
+df_portafolgio['VOL'] = df_portafolgio['CTV Complessivo'].pct_change()
+
+df_portafolgio['MAX DD'] = df_portafolgio['CTV_NETTO'] / df_portafolgio['MOVIMENTO_NETTO'].cumsum() - 1
+
 
 
 # performance = 

@@ -20,7 +20,8 @@ import requests
 import random
 
 
-import funzioni_pac
+import funzioni_dashboard
+import motore
 
 #%% CALCOLI INIZIALI
 
@@ -193,6 +194,7 @@ app.layout = html.Div([
     ),
     
     
+    
     html.Button('Stampa valori', id='calcola', n_clicks=0),  # aggiungi il pulsante
     html.Div(id='error-message')
     
@@ -264,26 +266,58 @@ def update_table(selected_values, data):
      ]
 )
 
-def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, deroga, pesi):
+def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, deroga, isin_selezionati):
     
     message = ""
     
     if n_clicks > 0:
         
-        print(data_inizio)
-        
-        print(importo_rata)
-        
-        print(frequenza)
-        
-        print(durata)
-        
-        print(deroga)
+
         
         
         #controlla che i pesi inseriti siano giusti
-        if(funzioni_pac.controlloSommaPesi(pesi)):
-            print(pesi)
+        if(funzioni_dashboard.controlloSommaPesi(isin_selezionati)):
+            
+            # print(data_inizio)
+            # print(type(data_inizio))
+            
+            # print(importo_rata)
+            # print(type(importo_rata))
+            
+            # print(frequenza)
+            # print(type(frequenza))
+            
+            
+            # print(durata)
+            # print(type(durata))
+            
+            # print(deroga)
+            # print(type(deroga))
+            
+            
+            # print(isin_selezionati)
+            # print(type(isin_selezionati))
+            
+            input_motore = {
+                "isin_selezionati": isin_selezionati,
+                "data_inizio": data_inizio,
+                "importo_rata": importo_rata,
+                "frequenza": frequenza,
+                "durata_anni": durata,
+                "giorno_mese":"8"
+            }
+            
+            
+            risultati = motore.Motore(input_motore)
+            
+            grafico = risultati["grafico"]
+            
+            
+            print(grafico)
+            
+            
+            print("funzione lanciata")
+            
             
         else:
             message = "Errori nei pesi"
