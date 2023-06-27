@@ -278,7 +278,7 @@ def update_table(selected_values, data):
 def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, deroga, isin_selezionati):
     message = ""
     fig = {}
-   
+    table = {}
 
     if n_clicks > 0:
 
@@ -295,18 +295,31 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             
             
             
-            # Code to create the table
-            table = html.Table([
-                html.Thead(
-                    html.Tr([html.Th(col) for col in input_motore.keys()])
-                ),
-                html.Tbody([
-                    html.Tr([html.Td(v) for v in input_motore.values()])
-                ])
-            ])
             
             
             risultati = motore.Motore(input_motore)
+            
+            
+            dati_tabella_perf =  {
+                  "Totale rate versate": risultati['Totale rate versate'],
+                  "patrimonio finale":risultati['patrimonio finale'],
+                  "plus": risultati['plus'],
+                  "MWRR": risultati['MWRR'],
+                  "MWRR_annualizzato":risultati['MWRR_annualizzato'],
+                  "Volatilita_finale": risultati['Volatilita_finale'],
+                  "Max_DD": risultati['Max_DD'],
+              }
+            
+            
+            # Code to create the table
+            table = html.Table([
+                html.Thead(
+                    html.Tr([html.Th(col) for col in dati_tabella_perf.keys()])
+                ),
+                html.Tbody([
+                    html.Tr([html.Td(v) for v in dati_tabella_perf.values()])
+                ])
+            ])
             
             
             df = risultati["Grafico"]
