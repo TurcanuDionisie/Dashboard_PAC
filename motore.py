@@ -381,12 +381,51 @@ def GraficoPortafolgio(risultati_performance, isin, totale_dovuto):
     
     
     grafico = pd.DataFrame()
-    
     grafico["CTV_NETTO"] = df_portafolgio['CTV_NETTO']
     grafico["MOVIMENTI"] = df_portafolgio["Movimenti"].cumsum()
+    
+    
+    
+    volatilita = df_portafolgio['CTV Complessivo'].resample('M').last().pct_change()
+
+
+    totale_rate_versate = sum(df_portafolgio['Movimenti'])
+
+    patrimonio_finale = df_portafolgio['CTV_NETTO'].iloc[-1]
+
+
+    plus = patrimonio_finale - totale_rate_versate
+
+
+    mwrr = plus / (sum(df_portafolgio['Numeri']) / (df_portafolgio.index[-1] - df_portafolgio.index[0]).days)
+
+
+    mwrr_annualizzato = ((1 + mwrr) ** (365 / (df_portafolgio.index[-1] - df_portafolgio.index[0]).days)) - 1
+
+
+    volatilita_finale = np.std(volatilita) * np.sqrt(12)
+
+
+
+    max_dd = min(df_portafolgio['MAX DD'])
+    
+    
+    risultato =  {
+          "Totale rate versate": totale_rate_versate,
+          "patrimonio finale": patrimonio_finale,
+          "plus": plus,
+          "MWRR": mwrr,
+          "MWRR_annualizzato": mwrr_annualizzato,
+          "Volatilita_finale": volatilita_finale,
+          "Max_DD": max_dd,
+          "Grafico": grafico
+      }
+    
+    
+    return risultato
+    
 
     
-    return grafico
 
 
 
@@ -497,16 +536,11 @@ def Motore (input_motore):
     
     
     
+    # in realtà contiene tutto
     grafico = GraficoPortafolgio(risultati_performance, isin, (importo_totale_rate + investimento_iniziale))
     
     
-    risultati = {
-        
-        "grafico": grafico
-        
-    }
-
     
-    return risultati
+    return grafico
     
     

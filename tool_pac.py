@@ -275,6 +275,7 @@ def update_table(selected_values, data):
 )
 def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, deroga, isin_selezionati):
     message = ""
+    fig = {}
    
 
     if n_clicks > 0:
@@ -290,10 +291,11 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
                 "giorno_mese":"8"
             }
             
+            
             risultati = motore.Motore(input_motore)
             
             
-            df = risultati["grafico"]
+            df = risultati["Grafico"]
 
             df = pd.DataFrame({
                 'x': df.index,
@@ -324,6 +326,13 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
                     yaxis={'title': 'Valore'}
                 )
             }
+            
+            
+            
+            
+            
+            
+            
 
         else:
             message = "Errori nei pesi"
