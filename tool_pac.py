@@ -100,6 +100,7 @@ selezione_deroga = {
 
 
 
+
 #%% DASHBOARD
 
 app = dash.Dash(__name__, 
@@ -194,6 +195,8 @@ app.layout = html.Div([
     
     html.Button('Stampa valori', id='calcola', n_clicks=0),  # aggiungi il pulsante
     html.Div(id='error-message')
+    
+    
 ])
 
 
@@ -288,6 +291,8 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             
     
     return None, message
+
+
 
 
 

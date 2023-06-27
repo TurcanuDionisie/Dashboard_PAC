@@ -285,7 +285,14 @@ volatilita_finale = np.std(volatilita) * np.sqrt(12)
 max_dd = min(quote['MAX DD'])
 
 
+grafico = pd.DataFrame()
+
+grafico["CTV_NETTO"] = quote['CTV_NETTO']
+grafico["MOVIMENTI"] = quote["Movimenti"].cumsum()
+
+grafico.to_excel("grafico.xlsx", index=True)
+
 
 #output su excel
-quote = quote.replace(0, np.nan)
-quote.to_excel("prova.xlsx", index=True)
+# quote = quote.replace(0, np.nan)
+# quote.to_excel("prova.xlsx", index=True)
