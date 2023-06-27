@@ -204,6 +204,7 @@ app.layout = html.Div([
     
     dcc.Graph(id='result-graph'),
     
+    html.Div(id='table-div'),
         
     
     html.Button('Stampa valori', id='calcola', n_clicks=0),  # aggiungi il pulsante
@@ -264,7 +265,8 @@ def update_table(selected_values, data):
 @app.callback(
     [Output('result-graph', 'figure'),
      Output('dummy-output', 'children'),
-     Output('error-message', 'children')],
+     Output('error-message', 'children'),
+     Output('table-div', 'children')],
     [Input('calcola', 'n_clicks'),
      Input('data-inizio', 'value'),
      Input('importo-rata', 'value'),
@@ -290,6 +292,18 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
                 "durata_anni": durata,
                 "giorno_mese":"8"
             }
+            
+            
+            
+            # Code to create the table
+            table = html.Table([
+                html.Thead(
+                    html.Tr([html.Th(col) for col in input_motore.keys()])
+                ),
+                html.Tbody([
+                    html.Tr([html.Td(v) for v in input_motore.values()])
+                ])
+            ])
             
             
             risultati = motore.Motore(input_motore)
@@ -337,7 +351,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
         else:
             message = "Errori nei pesi"
 
-    return fig, None, message  # Returns figure to the graph, None to the 'dummy-output', and the error message to 'error-message'.
+    return fig, None, message, table  # Returns figure to the graph, None to the 'dummy-output', and the error message to 'error-message'.
 
 
 
