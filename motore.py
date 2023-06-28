@@ -146,8 +146,6 @@ def EseguiAnalisi (input_motore):
         #calcolo le performance di ogni fondo
         risultati_performance[isin] = funzioni_motore.calcola_performance(dati_input_performance)
         
-        
-        
 
         print(isin)
         print("totale rate versate " + str(risultati_performance[isin]["Totale rate versate"]))
@@ -161,11 +159,23 @@ def EseguiAnalisi (input_motore):
     
     
     
-    # contiene dati per grafici e tabella
-    # grafico = funzioni_motore.GraficoPortafolgio(risultati_performance, isin, (importo_totale_rate + investimento_iniziale))
+    #dati input per portafolgio
+    dati_input_portafolgio = {
+        
+        "risultati_performance": risultati_performance,
+        "importo_totale_rate": importo_totale_rate,
+        "investimento_iniziale": investimento_iniziale,
+    }
+    
+    
+    # contiene tutti i dati elaborati del portafolgio
+    elaborazione = funzioni_motore.CalcolaPerformancePortafolgio(dati_input_portafolgio)
     
     
     
-    # return grafico
+    print(elaborazione)
+    
+    
+    return elaborazione
     
     

@@ -271,26 +271,13 @@ max_date = quote.index.max()
 quote['Numeri'] = quote['Movimenti'] * (max_date - quote.index).days
 
 
-
-
-
 totale_dovuto = importo_totale_rate + investimento_iniziale
 quote['CTV Complessivo'] = quote['CTV_NETTO'] + totale_dovuto - quote['MOVIMENTO_NETTO'].cumsum()
 
 
-
-
 quote['VOL'] = quote['CTV Complessivo'].pct_change()
 
-
-
-
 quote['MAX DD'] = quote['CTV_NETTO'] / quote['MOVIMENTO_NETTO'].cumsum() - 1
-
-
- 
-
-
 
 
 volatilita = quote['CTV Complessivo'].resample('M').last().pct_change()
@@ -322,3 +309,86 @@ risultato = {
     "Max_DD": max_dd,
     "Calcoli": quote
 }
+
+
+
+
+#########################
+
+
+
+risultati_performance = {
+    "IE0004878744": risultato
+} 
+
+
+#dati input fittizzi
+dati_input = {
+    
+    "risultati_performance": risultati_performance,
+    "importo_totale_rate": 24000,
+    "investimento_iniziale": 2400,
+}
+
+
+risultati_performance = dati_input["risultati_performance"]
+importo_totale_rate = dati_input["importo_totale_rate"]
+investimento_iniziale = dati_input["investimento_iniziale"]
+
+
+indici = risultati_performance[next(iter(risultati_performance))]["Calcoli"].index
+colonne = ['Movimenti', 'MOVIMENTO_NETTO', 'CTV_LORDO', 'CTV_NETTO']
+
+
+portafolgio = pd.DataFrame(columns=colonne, index=indici).fillna(0)
+
+
+
+for isin in risultati_performance:
+    portafolgio["Movimenti"] += risultati_performance[isin]["Calcoli"]["Movimenti"]
+    portafolgio["MOVIMENTO_NETTO"] += risultati_performance[isin]["Calcoli"]["MOVIMENTO_NETTO"]
+    portafolgio["CTV_LORDO"] += risultati_performance[isin]["Calcoli"]["CTV_LORDO"]
+    portafolgio["CTV_NETTO"] += risultati_performance[isin]["Calcoli"]["CTV_NETTO"]
+
+
+
+
+max_date = portafolgio.index.max()
+portafolgio['Numeri'] = portafolgio['Movimenti'] * (max_date - portafolgio.index).days
+
+
+totale_dovuto = importo_totale_rate + investimento_iniziale
+portafolgio['CTV Complessivo'] = portafolgio['CTV_NETTO'] + totale_dovuto - quote['MOVIMENTO_NETTO'].cumsum()
+
+
+portafolgio['VOL'] = portafolgio['CTV Complessivo'].pct_change()
+
+portafolgio['MAX DD'] = portafolgio['CTV_NETTO'] / portafolgio['MOVIMENTO_NETTO'].cumsum() - 1
+
+
+volatilita = portafolgio['CTV Complessivo'].resample('M').last().pct_change()
+
+totale_rate_versate = sum(portafolgio['Movimenti'])
+
+patrimonio_finale = portafolgio['CTV_NETTO'].iloc[-1]
+
+plus = patrimonio_finale - totale_rate_versate
+
+mwrr = plus / (sum(portafolgio['Numeri']) / (portafolgio.index[-1] - portafolgio.index[0]).days)
+
+mwrr_annualizzato = ((1 + mwrr) ** (365 / (portafolgio.index[-1] - portafolgio.index[0]).days)) - 1
+
+volatilita_finale = np.std(volatilita) * np.sqrt(12)
+
+
+risultato = {
+    "Totale rate versate": totale_rate_versate,
+    "patrimonio finale": patrimonio_finale,
+    "plus": plus,
+    "MWRR": mwrr,
+    "MWRR_annualizzato": mwrr_annualizzato,
+    "Volatilita_finale": volatilita_finale,
+    "Max_DD": max_dd,
+}
+
+
