@@ -24,8 +24,8 @@ dati_input = {
     'quote': base_dati["IE0004878744"],
     
     #costi
-    'costi_sottoscrizione': 0.02,
-    'diritti_fissi_iniziali': 2.58,
+    'costi_sottoscrizione': 0.03,
+    'diritti_fissi_iniziali': 2.4,
     'diritti_fissi': 1.54,
     
     #quanto pesa nel portafolgio
@@ -294,10 +294,48 @@ mwrr_annualizzato = ((1 + mwrr) ** (365 / (quote.index[-1] - quote.index[0]).day
 
 volatilita_finale = np.std(volatilita) * np.sqrt(12)
 
-
-
-
 max_dd = min(quote['MAX DD'])
+
+
+
+#COLONNA QUOTE
+quote["Quote"] = quote['MOVIMENTO_NETTO'] / quote[quote.columns[0]]
+
+
+
+#COLONNA QUOTE CUMULATE
+quote["Quote Cumulate"] = quote["Quote"].cumsum()
+
+
+
+
+# COLONNA PMC
+indici = quote.index.tolist()
+
+quote['PMC'] = np.nan
+quote.at[indici[0], 'PMC'] = quote.loc[indici[0], quote.columns[0]]
+
+for i in range(1, len(quote)):
+    prev_pmc = quote.at[indici[i - 1], 'PMC']
+    prev_cum_quote = quote.at[indici[i - 1], 'Quote Cumulate']
+    curr_val_quota = quote.at[indici[i], quote.columns[0]]
+    curr_quote = quote.at[indici[i], 'Quote']
+    curr_cum_quote = quote.at[indici[i], 'Quote Cumulate']
+    quote.at[indici[i], 'PMC'] = ((prev_pmc * prev_cum_quote) + (curr_val_quota * curr_quote)) / curr_cum_quote
+
+
+
+
+
+# Applico np.where per sostituire i valori di VAL_QUOTA con NaN quando Movimenti è 0
+quote['VAL_QUOTA_FILT'] = np.where(quote['Movimenti'] != 0, quote[quote.columns[0]], np.nan)
+
+# Calcolo la media cumulativa, ignorando i NaN
+quote['Prezzo_medio'] = quote['VAL_QUOTA_FILT'].expanding().mean()
+
+
+
+
 
 risultato = {
     "Totale rate versate": totale_rate_versate,
@@ -309,6 +347,16 @@ risultato = {
     "Max_DD": max_dd,
     "Calcoli": quote
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

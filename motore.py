@@ -159,6 +159,9 @@ def EseguiAnalisi (input_motore):
     
     
     
+    
+    
+    
     #dati input per portafolgio
     dati_input_portafolgio = {
         

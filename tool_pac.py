@@ -349,7 +349,6 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             
             
             
-                
                 dati_tabella_perf = {
                     
                     "Frequenza Rate": frequenza,
