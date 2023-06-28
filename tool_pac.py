@@ -207,6 +207,8 @@ app.layout = html.Div([
     html.Div(id='table-div'),
         
     
+    dcc.Graph(id='pie-chart'),  # The new pie chart graph
+    
     html.Button('Stampa valori', id='calcola', n_clicks=0),  # aggiungi il pulsante
     html.Div(id='error-message')
     
@@ -266,7 +268,8 @@ def update_table(selected_values, data):
     [Output('result-graph', 'figure'),
      Output('dummy-output', 'children'),
      Output('error-message', 'children'),
-     Output('table-div', 'children')],
+     Output('table-div', 'children'),
+     Output('pie-chart', 'figure')],
     [Input('calcola', 'n_clicks'),
      Input('data-inizio', 'value'),
      Input('importo-rata', 'value'),
@@ -361,28 +364,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
                     
                 }
                 
-                
-                    # "Frequenza Rate": frequenza,
-                    # "Importo Rata": round(importo_rata,1),
-                    # "Totale Rate Versate": round(risultati["Totale rate versate"],1),
-                    # "Patrimonio Finale": round(risultati["patrimonio finale"],1),
-                    # "Plus/Minus": round(risultati["plus"],1),
-                    # "MWRR Totale": str(round(risultati["MWRR"],2)) + "%",
-                    # "MWRR Annualizzato": str(round(risultati["MWRR_annualizzato"],2)) + "%",
-                    # "Volatilita": str(round(risultati["Volatilita_finale"],2)) + "%",
-                    # "Max DD": str(round(risultati["Max_DD"],2)) + "%",
             
-            
-            # dati_tabella_perf =  {
-            #       "Totale rate versate": risultati['Totale rate versate'],
-            #       "patrimonio finale":risultati['patrimonio finale'],
-            #       "plus": risultati['plus'],
-            #       "MWRR": risultati['MWRR'],
-            #       "MWRR_annualizzato":risultati['MWRR_annualizzato'],
-            #       "Volatilita_finale": risultati['Volatilita_finale'],
-            #       "Max_DD": risultati['Max_DD'],
-            #   }
-                
             
                 # Code to create the table
                 table = html.Table([
@@ -396,13 +378,19 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             
             
 
+            pie_chart = go.Figure()
+
+            labels = ["Versato", "Contributo Mercato"]
+            values = [risultati["Totale rate versate"], (risultati["patrimonio finale"] - risultati["Totale rate versate"])]
+    
+            pie_chart.add_trace(go.Pie(labels=labels, values=values))
  
             
 
         else:
             message = "Errori nei pesi"
 
-    return fig, None, message, table  # Returns figure to the graph, None to the 'dummy-output', and the error message to 'error-message'.
+    return fig, None, message, table, pie_chart    # Returns figure to the graph, None to the 'dummy-output', and the error message to 'error-message'.
 
 
 
