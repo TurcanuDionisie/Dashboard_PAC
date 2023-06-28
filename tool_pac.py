@@ -194,12 +194,16 @@ app.layout = html.Div([
     ),
     
     
-    #data inizio
+    #deroga
     dcc.Dropdown(
         id='deroga',
         options=[{'label': str(deroga), 'value': str(deroga)} for deroga in selezione_deroga],
         value='Nessuna'
     ),
+    
+    
+    html.Button('Calcola', id='calcola', n_clicks=0),  # aggiungi il pulsante
+    html.Div(id='error-message'),
     
     
     dcc.Graph(id='result-graph'),
@@ -209,8 +213,9 @@ app.layout = html.Div([
     
     dcc.Graph(id='pie-chart'),  # The new pie chart graph
     
-    html.Button('Stampa valori', id='calcola', n_clicks=0),  # aggiungi il pulsante
-    html.Div(id='error-message')
+    dcc.Tabs(id="my-tabs"),
+    
+
     
     
 ])
@@ -262,6 +267,9 @@ def update_table(selected_values, data):
             ])
             rows.append(row)
         return rows
+    
+    
+
 
 
 @app.callback(
@@ -269,17 +277,19 @@ def update_table(selected_values, data):
      Output('dummy-output', 'children'),
      Output('error-message', 'children'),
      Output('table-div', 'children'),
-     Output('pie-chart', 'figure')],
+     Output('pie-chart', 'figure'),
+     Output('my-tabs', 'children')],
     [Input('calcola', 'n_clicks'),
      Input('data-inizio', 'value'),
      Input('importo-rata', 'value'),
      Input('frequenza', 'value'),
      Input('durata', 'value'),
      Input('deroga', 'value'),
+     Input('multi-dropdown', 'value')
      ],
     [State('store-inputs', 'data')]
 )
-def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, deroga, isin_selezionati):
+def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, deroga, finestre, isin_selezionati):
     message = ""
     fig = {}
     table = {}
@@ -383,13 +393,27 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             values = [risultati["Totale rate versate"], (risultati["patrimonio finale"] - risultati["Totale rate versate"])]
     
             pie_chart.add_trace(go.Pie(labels=labels, values=values))
+            
+            
+            if finestre is None or len(finestre) == 0:
+                return []
+            else:
+                tabs = []
+                for i, value in enumerate(finestre):
+                    tab = dcc.Tab(label=value, children=[
+                        dcc.Graph(
+                            id={'type': 'dynamic-graph', 'index': value},  # usa il valore come indice dell'id
+                            # assuming you will update this graph in another callback
+                        )
+                    ])
+                    tabs.append(tab)
  
             
 
         else:
             message = "Errori nei pesi"
 
-    return fig, None, message, table, pie_chart    # Returns figure to the graph, None to the 'dummy-output', and the error message to 'error-message'.
+    return fig, None, message, table, pie_chart, tabs    # Returns figure to the graph, None to the 'dummy-output', and the error message to 'error-message'.
 
 
 
