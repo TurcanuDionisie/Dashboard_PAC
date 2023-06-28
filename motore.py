@@ -45,7 +45,7 @@ def EseguiAnalisi (input_motore):
     #estrazione dati input utente (tutti)
     frequenza =  input_motore['frequenza']
     importo_rata = float(input_motore['importo_rata'])
-    durata_anni = int(input_motore['durata_anni'])
+    durata_anni = float(input_motore['durata_anni'])
     giorno_del_mese = int(input_motore['giorno_mese'])
     
     #non ancora gestito
@@ -93,7 +93,6 @@ def EseguiAnalisi (input_motore):
     #calcola costi
     costi = funzioni_motore.calcola_costi(dati_input_costi)
     
-    print(costi)
 
     
     #controlla importo rata minima
@@ -125,9 +124,9 @@ def EseguiAnalisi (input_motore):
             "peso" : peso,
             
             #costi
-            "costo_sottoscrizione" : costi["costi_sottoscrizione"],
-            "diritto_fisso_iniziale" : costi["diritti_fissi_iniziali"],
-            "diritto_fisso" : costi["diritti_fissi"],
+            "costi_sottoscrizione" : costi["costi_sottoscrizione"],
+            "diritti_fissi_iniziali" : costi["diritti_fissi_iniziali"],
+            "diritti_fissi" : costi["diritti_fissi"],
             
             #sconti
             "deroga_totale" : deroga_totale,
@@ -138,6 +137,7 @@ def EseguiAnalisi (input_motore):
             "giorno_del_mese" : giorno_del_mese,
             "numero_rate" : numero_rate,
             "importo_rata" : importo_rata,
+            "durata_anni": durata_anni
             
         }
         
@@ -145,10 +145,23 @@ def EseguiAnalisi (input_motore):
         
         #calcolo le performance di ogni fondo
         risultati_performance[isin] = funzioni_motore.calcola_performance(dati_input_performance)
+        
+        
+        
+
+        print(isin)
+        print("totale rate versate " + str(risultati_performance[isin]["Totale rate versate"]))
+        print("patrimonio finale " + str(risultati_performance[isin]["patrimonio finale"]))
+        print("plus " + str(risultati_performance[isin]["plus"]))
+        print("MWRR " + str(risultati_performance[isin]["MWRR"] * 100))
+        print("MWRR_annualizzato " + str(risultati_performance[isin]["MWRR_annualizzato"] * 100))
+        print("Volatilita_finale " + str(risultati_performance[isin]["Volatilita_finale"] * 100))
+        print("Max_DD " + str(risultati_performance[isin]["Max_DD"] * 100))
+        
     
     
     
-    # # in realtà contiene tutto
+    # contiene dati per grafici e tabella
     # grafico = funzioni_motore.GraficoPortafolgio(risultati_performance, isin, (importo_totale_rate + investimento_iniziale))
     
     
