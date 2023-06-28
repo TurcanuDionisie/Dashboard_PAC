@@ -3,87 +3,124 @@ import numpy as np
 import os
 
 
+
 folder_path = r"C:\Users\Dionisie.Turcanu\Documents\GitHub\Dashboard_PAC"
 os.chdir(folder_path)
 
+
+
+#lettura file input
+file_decodifiche = pd.read_excel('costi.xlsx', index_col=0)
 base_dati = pd.read_excel('DB_TOT_PROXY.xlsx', index_col=0)
 
 
 
 
 
-# %% PARAMETRI
+#dati input fittizzi
+dati_input = {
+    
+    #serie storica
+    'quote': base_dati["IE0004878744"],
+    
+    #costi
+    'costi_sottoscrizione': 0.02,
+    'diritti_fissi_iniziali': 2.58,
+    'diritti_fissi': 1.54,
+    
+    #quanto pesa nel portafolgio
+    'peso': 100.0,
+    
+    #sconti
+    'deroga_totale': 1,
+    'deroga_iniziale': 1,
+    'num_mesi': 1,
+    
+    #info rata
+    'giorno_del_mese': 8,
+    'numero_rate': 120.0,
+    'importo_rata': 200.0,
+    'durata_anni': 10
 
-quote = base_dati["IE0004878744"]
-
-
-#peso dentro il portafolgio
-#da 0 a 1
-peso = 1
-
-
-costo_sottoscrizione = 0.03
-diritto_fisso_iniziale = 2.4 * peso
-diritto_fisso = 1.54 * peso
-
-
-#1 = 0% sconto
-#0 = 100% sconto
-deroga_totale = 1
-deroga_iniziale = 1
-
-
-
-giorno_del_mese = 8  # Scegli tra 8 e 28
-
-
-# Mappa la frequenza a un numero di mesi
-frequenze = {
-    'Mensile': 1,
-    'Bimestrale': 2,
-    'Trimestrale': 3,
-    'Quadrimestrale': 4,
-    'Semestrale': 6,
-    'Annuale': 12,
 }
 
 
+peso = dati_input["peso"]
+#trasformo il peso in percentuale
+peso = peso / 100
+
+
+
+quote = dati_input["quote"]
+
+
+
+
+# espresso in percentuale
+costo_sottoscrizione = dati_input["costi_sottoscrizione"]
+
+
+#espresso in euro
+diritto_fisso_iniziale = dati_input["diritti_fissi_iniziali"]
+diritto_fisso = dati_input["diritti_fissi"]
+
+
+deroga_totale = dati_input["deroga_totale"]
+deroga_iniziale = dati_input["deroga_iniziale"]
+
 
 #ogni quanti mesi investe
-frequenza = 'Mensile'  # Scegli tra: 'Mensile', 'Bimestrale', 'Trimestrale', 'Quadrimestrale', 'Semestrale', 'Annuale'
-num_mesi = frequenze[frequenza]
+num_mesi = dati_input["num_mesi"]
 
 
-durata_anni = 10
-importo_rata = 200 * peso
-numero_rate = (12 / num_mesi) * durata_anni
+giorno_del_mese = dati_input["giorno_del_mese"]
+
+
+numero_rate = dati_input["numero_rate"]
+
+
+importo_rata = dati_input["importo_rata"] * peso
+
+
+durata_anni = dati_input["durata_anni"]
 
 
 
+
+
+#già pesata
 importo_rata_mensile = (importo_rata * (12 / num_mesi) * durata_anni) / (durata_anni * 12)
 
 investimento_iniziale = importo_rata_mensile * 12
 
-
-
 #escluso versamento iniziale
-importo_totale = numero_rate * importo_rata
+importo_totale_rate = numero_rate * importo_rata
 
 
 
-importo_costo_sottoscrizione = costo_sottoscrizione * (importo_totale + investimento_iniziale)
 
+
+# Vado a pesare i costi di competenza del fondo
+diritto_fisso_iniziale = diritto_fisso_iniziale * peso
+diritto_fisso = diritto_fisso * peso
+
+
+
+importo_costo_sottoscrizione = costo_sottoscrizione * (importo_totale_rate + investimento_iniziale)
+
+
+
+
+# Divido i costi in fette
 prima_fetta = importo_costo_sottoscrizione * 0.33 * deroga_totale * deroga_iniziale
 seconda_fetta = importo_costo_sottoscrizione * 0.19 * deroga_totale
 terza_fetta = importo_costo_sottoscrizione * 0.48 * deroga_totale
 
 
-# %% MOVIMENTI
 
+# In quote ho lo storico, piano piano ci aggiungo le varie colonne
 
-
-
-# Crea un nuovo DataFrame per i movimenti
+# MOVIMENTI
 movimenti = pd.DataFrame(index=quote.index)
 movimenti['Movimenti'] = 0
 
@@ -109,10 +146,10 @@ for year, month in mesi_anni:
         # Trova tutte le date per quel mese e anno
         dates = quote.index[(quote.index.year == year) & (quote.index.month == month)]
         dates = dates.sort_values()  # Assicurati che le date siano ordinate
-        
+
         # Trova la prossima data disponibile dopo il giorno_del_mese
         date = trova_data(dates, giorno_del_mese)
-        
+
         # Aggiungi la rata se la data è valida e non abbiamo già aggiunto tutte le rate
         if date is not None and rate_added < numero_rate:
             movimenti.loc[date] += importo_rata
@@ -124,10 +161,11 @@ quote = pd.concat([quote, movimenti], axis=1)
 
 
 
-# %% COSTI UP1
 
 
-# Crea una nuova colonna "COSTI UP1" con tutti valori NaN
+
+
+# COSTI UP1
 quote['COSTI UP1'] = np.nan
 
 # Trova gli indici dei movimenti
@@ -149,12 +187,12 @@ for i in range(7, len(movimenti_index)):
 
 
 
-# %% COSTI UP2
-
-# Definisci le variabili
 
 
-# Crea una nuova colonna "COSTI UP3" con tutti valori NaN
+
+
+# COSTI UP3
+
 quote['COSTI UP3'] = np.nan
 
 # Trova gli indici dei movimenti
@@ -166,23 +204,22 @@ quote.loc[movimenti_index[0], 'COSTI UP3'] = diritto_fisso_iniziale
 # Applica il diritto fisso a tutti gli altri movimenti
 for i in range(1, len(movimenti_index)):
     quote.loc[movimenti_index[i], 'COSTI UP3'] = diritto_fisso
+    
+    
+    
 
 
-
-# %%
-
-
+    
+# MOVIMENTO NETTO
 quote["MOVIMENTO_NETTO"] = quote["Movimenti"] - quote["COSTI UP1"] - quote["COSTI UP3"]
 
 
-# %%
 
 
+
+# CTV LORDO
 quote = quote.fillna(0)
 
-
-
-# Crea una nuova colonna "CTV_LORDO" con tutti valori NaN
 quote['CTV_LORDO'] = np.nan
 
 # Trova gli indici dei movimenti
@@ -197,13 +234,16 @@ for i in range(1, len(quote.index)):
     quote_precedente = quote.loc[quote.index[i-1], quote.columns[0]]
     quote_corrispettivo = quote.loc[quote.index[i], quote.columns[0]]
     movimento_corrispettivo = quote.loc[quote.index[i], 'Movimenti']
-    
+
     quote.loc[quote.index[i], 'CTV_LORDO'] = (ctv_precedente * quote_corrispettivo / quote_precedente) + movimento_corrispettivo
 
 
 
 
-# Crea una nuova colonna "CTV_LORDO" con tutti valori NaN
+
+
+
+# CTV NETTO
 quote['CTV_NETTO'] = np.nan
 
 # Trova gli indici dei movimenti
@@ -218,81 +258,67 @@ for i in range(1, len(quote.index)):
     quote_precedente = quote.loc[quote.index[i-1], quote.columns[0]]
     quote_corrispettivo = quote.loc[quote.index[i], quote.columns[0]]
     movimento_corrispettivo = quote.loc[quote.index[i], 'MOVIMENTO_NETTO']
-    
+
     quote.loc[quote.index[i], 'CTV_NETTO'] = (ctv_precedente * quote_corrispettivo / quote_precedente) + movimento_corrispettivo
-
-
-
-# %% 
+    
+    
+    
+    
+    
 
 
 max_date = quote.index.max()
-
-# Crea la colonna 'Numeri'
 quote['Numeri'] = quote['Movimenti'] * (max_date - quote.index).days
 
 
 
-# %%
 
 
-
-totale_dovuto = importo_totale + investimento_iniziale
-
-
-# Calcola 'CTV Complessivo'
+totale_dovuto = importo_totale_rate + investimento_iniziale
 quote['CTV Complessivo'] = quote['CTV_NETTO'] + totale_dovuto - quote['MOVIMENTO_NETTO'].cumsum()
 
 
 
-# %%
 
 quote['VOL'] = quote['CTV Complessivo'].pct_change()
 
 
-# %%
+
 
 quote['MAX DD'] = quote['CTV_NETTO'] / quote['MOVIMENTO_NETTO'].cumsum() - 1
 
 
-# %%
+ 
+
+
+
 
 volatilita = quote['CTV Complessivo'].resample('M').last().pct_change()
-
-
-numero_rate
-
-importo_rata
 
 totale_rate_versate = sum(quote['Movimenti'])
 
 patrimonio_finale = quote['CTV_NETTO'].iloc[-1]
 
-
 plus = patrimonio_finale - totale_rate_versate
-
 
 mwrr = plus / (sum(quote['Numeri']) / (quote.index[-1] - quote.index[0]).days)
 
-
 mwrr_annualizzato = ((1 + mwrr) ** (365 / (quote.index[-1] - quote.index[0]).days)) - 1
-
 
 volatilita_finale = np.std(volatilita) * np.sqrt(12)
 
 
 
+
 max_dd = min(quote['MAX DD'])
 
-
-grafico = pd.DataFrame()
-
-grafico["CTV_NETTO"] = quote['CTV_NETTO']
-grafico["MOVIMENTI"] = quote["Movimenti"].cumsum()
-
-grafico.to_excel("grafico.xlsx", index=True)
-
-
-#output su excel
-# quote = quote.replace(0, np.nan)
-# quote.to_excel("prova.xlsx", index=True)
+risultato = {
+    "Totale rate versate": totale_rate_versate,
+    "patrimonio finale": patrimonio_finale,
+    "plus": plus,
+    "MWRR": mwrr,
+    "MWRR_annualizzato": mwrr_annualizzato,
+    "Volatilita_finale": volatilita_finale,
+    "Max_DD": max_dd,
+    "Calcoli": quote
+}

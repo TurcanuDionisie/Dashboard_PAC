@@ -1,5 +1,3 @@
-
-
 def controlloSommaPesi(pesi):
     
     somma_pesi = 0
@@ -12,7 +10,7 @@ def controlloSommaPesi(pesi):
         return False
     
     
-    if(somma_pesi < 100 | somma_pesi > 100):
+    if(somma_pesi != 100):
         return False
     
     return True

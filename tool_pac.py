@@ -272,7 +272,8 @@ def update_table(selected_values, data):
      Input('importo-rata', 'value'),
      Input('frequenza', 'value'),
      Input('durata', 'value'),
-     Input('deroga', 'value')],
+     Input('deroga', 'value'),
+     ],
     [State('store-inputs', 'data')]
 )
 def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, deroga, isin_selezionati):
@@ -282,9 +283,13 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
 
     if n_clicks > 0:
 
-        if(funzioni_dashboard.controlloSommaPesi(isin_selezionati)):
+        #controlla che la somma dei pesi sia 100
+        # if(funzioni_dashboard.controlloSommaPesi(isin_selezionati)):
+        if(True):
+                        
             
-            input_motore = {
+            #input inseriti dall'utente
+            input_utente = {
                 "isin_selezionati": isin_selezionati,
                 "data_inizio": data_inizio,
                 "importo_rata": importo_rata,
@@ -295,64 +300,79 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             
             
             
+            #passo tutti gli input utente al motore
+            risultati = motore.EseguiAnalisi(input_utente)
             
             
-            risultati = motore.Motore(input_motore)
+            #controlla importo minimo rate
+            if(risultati == "ERRORE RATA MENSILE"):
+                message = "IMPORTO RATA NON RISPETTA IMPORTO MINIMO"
+            elif(risultati == "ERRORE IMPORTO MINIMO"):
+                message = "IMPORTO MINIMO SU UN FONDO NON RISPETTATO"
+            
+            # else:
+                
             
             
-            dati_tabella_perf =  {
-                  "Totale rate versate": risultati['Totale rate versate'],
-                  "patrimonio finale":risultati['patrimonio finale'],
-                  "plus": risultati['plus'],
-                  "MWRR": risultati['MWRR'],
-                  "MWRR_annualizzato":risultati['MWRR_annualizzato'],
-                  "Volatilita_finale": risultati['Volatilita_finale'],
-                  "Max_DD": risultati['Max_DD'],
-              }
             
             
-            # Code to create the table
-            table = html.Table([
-                html.Thead(
-                    html.Tr([html.Th(col) for col in dati_tabella_perf.keys()])
-                ),
-                html.Tbody([
-                    html.Tr([html.Td(v) for v in dati_tabella_perf.values()])
-                ])
-            ])
+            
+            # risultati = motore.Motore(input_utente)
             
             
-            df = risultati["Grafico"]
+            # dati_tabella_perf =  {
+            #       "Totale rate versate": risultati['Totale rate versate'],
+            #       "patrimonio finale":risultati['patrimonio finale'],
+            #       "plus": risultati['plus'],
+            #       "MWRR": risultati['MWRR'],
+            #       "MWRR_annualizzato":risultati['MWRR_annualizzato'],
+            #       "Volatilita_finale": risultati['Volatilita_finale'],
+            #       "Max_DD": risultati['Max_DD'],
+            #   }
+            
+            
+            # # Code to create the table
+            # table = html.Table([
+            #     html.Thead(
+            #         html.Tr([html.Th(col) for col in dati_tabella_perf.keys()])
+            #     ),
+            #     html.Tbody([
+            #         html.Tr([html.Td(v) for v in dati_tabella_perf.values()])
+            #     ])
+            # ])
+            
+            
+            # df = risultati["Grafico"]
 
-            df = pd.DataFrame({
-                'x': df.index,
-                'y1': df["CTV_NETTO"],
-                'y2': df["MOVIMENTI"]
-            })
+            # df = pd.DataFrame({
+            #     'x': df.index,
+            #     'y1': df["CTV_NETTO"],
+            #     'y2': df["MOVIMENTI"]
+            # })
 
-            df_bar = df.iloc[::10, :]
+            # df_bar = df.iloc[::10, :]
 
-            fig = {
-                'data': [
-                    go.Scatter(  # linea
-                        x=df['x'],
-                        y=df['y1'],
-                        mode='lines',
-                        name='Linea'
-                    ),
-                    go.Bar(  # barre
-                        x=df_bar['x'],
-                        y=df_bar['y2'],
-                        name='Barre',
-                        width=3
-                    )
-                ],
-                'layout': go.Layout(
-                    title='Linea e Barre su un Unico Grafico',
-                    xaxis={'title': 'Data'},
-                    yaxis={'title': 'Valore'}
-                )
-            }
+            # fig = {
+            #     'data': [
+            #         go.Scatter(  # linea
+            #             x=df['x'],
+            #             y=df['y1'],
+            #             mode='lines',
+            #             name='Linea'
+            #         ),
+            #         go.Bar(  # barre
+            #             x=df_bar['x'],
+            #             y=df_bar['y2'],
+            #             name='Barre',
+            #             width=3
+            #         )
+            #     ],
+            #     'layout': go.Layout(
+            #         title='Linea e Barre su un Unico Grafico',
+            #         xaxis={'title': 'Data'},
+            #         yaxis={'title': 'Valore'}
+            #     )
+            # }
             
             
             
