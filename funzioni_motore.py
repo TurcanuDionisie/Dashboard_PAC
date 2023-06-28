@@ -428,6 +428,15 @@ def CalcolaPerformancePortafolgio(dati_input):
     volatilita_finale = np.std(volatilita) * np.sqrt(12)
 
     max_dd = min(portafolgio['MAX DD'])
+    
+    
+    
+    
+    #Dati per grafico portafolgio
+    grafico = pd.DataFrame()
+    grafico["CTV_NETTO"] = portafolgio['CTV_NETTO']
+    grafico["MOVIMENTI"] = portafolgio["Movimenti"].cumsum()
+    
 
     risultato = {
         "Totale rate versate": totale_rate_versate,
@@ -437,6 +446,7 @@ def CalcolaPerformancePortafolgio(dati_input):
         "MWRR_annualizzato": mwrr_annualizzato,
         "Volatilita_finale": volatilita_finale,
         "Max_DD": max_dd,
+        "Grafico": grafico
     }
     
     return risultato

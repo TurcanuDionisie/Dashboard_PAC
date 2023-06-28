@@ -310,14 +310,67 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             elif(risultati == "ERRORE IMPORTO MINIMO"):
                 message = "IMPORTO MINIMO SU UN FONDO NON RISPETTATO"
             
-            # else:
+            else:
                 
+                grafico_ptf = risultati["Grafico"]
+    
+                grafico_ptf = pd.DataFrame({
+                    'x': grafico_ptf.index,
+                    'y1': grafico_ptf["CTV_NETTO"],
+                    'y2': grafico_ptf["MOVIMENTI"]
+                })
+    
+                df_bar = grafico_ptf.iloc[::10, :]
+    
+                fig = {
+                    'data': [
+                        go.Scatter(  # linea
+                            x=grafico_ptf['x'],
+                            y=grafico_ptf['y1'],
+                            mode='lines',
+                            name='Linea'
+                        ),
+                        go.Bar(  # barre
+                            x=df_bar['x'],
+                            y=df_bar['y2'],
+                            name='Barre',
+                            width=3
+                        )
+                    ],
+                    'layout': go.Layout(
+                        title='Linea e Barre su un Unico Grafico',
+                        xaxis={'title': 'Data'},
+                        yaxis={'title': 'Valore'}
+                    )
+                }
             
             
             
-            
-            
-            # risultati = motore.Motore(input_utente)
+                
+                dati_tabella_perf = {
+                    
+                    "Frequenza Rate": frequenza,
+                    "Importo Rata": importo_rata,
+                    "Totale Rate Versate": risultati["Totale rate versate"],
+                    "Patrimonio Finale": round(risultati["patrimonio finale"],2),
+                    "Plus/Minus": round(risultati["plus"] ,2),
+                    "MWRR Totale": round(risultati["MWRR"] * 100 ,2),
+                    "MWRR Annualizzato": round(risultati["MWRR_annualizzato"] * 100 ,2),
+                    "Volatilita": round(risultati["Volatilita_finale"] * 100 ,2),
+                    "Max DD": round(risultati["Max_DD"] * 100 ,2)
+                    
+                }
+                
+                
+                    # "Frequenza Rate": frequenza,
+                    # "Importo Rata": round(importo_rata,1),
+                    # "Totale Rate Versate": round(risultati["Totale rate versate"],1),
+                    # "Patrimonio Finale": round(risultati["patrimonio finale"],1),
+                    # "Plus/Minus": round(risultati["plus"],1),
+                    # "MWRR Totale": str(round(risultati["MWRR"],2)) + "%",
+                    # "MWRR Annualizzato": str(round(risultati["MWRR_annualizzato"],2)) + "%",
+                    # "Volatilita": str(round(risultati["Volatilita_finale"],2)) + "%",
+                    # "Max DD": str(round(risultati["Max_DD"],2)) + "%",
             
             
             # dati_tabella_perf =  {
@@ -329,56 +382,21 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             #       "Volatilita_finale": risultati['Volatilita_finale'],
             #       "Max_DD": risultati['Max_DD'],
             #   }
+                
+            
+                # Code to create the table
+                table = html.Table([
+                    html.Thead(
+                        html.Tr([html.Th(col) for col in dati_tabella_perf.keys()])
+                    ),
+                    html.Tbody([
+                        html.Tr([html.Td(v) for v in dati_tabella_perf.values()])
+                    ])
+                ])
             
             
-            # # Code to create the table
-            # table = html.Table([
-            #     html.Thead(
-            #         html.Tr([html.Th(col) for col in dati_tabella_perf.keys()])
-            #     ),
-            #     html.Tbody([
-            #         html.Tr([html.Td(v) for v in dati_tabella_perf.values()])
-            #     ])
-            # ])
-            
-            
-            # df = risultati["Grafico"]
 
-            # df = pd.DataFrame({
-            #     'x': df.index,
-            #     'y1': df["CTV_NETTO"],
-            #     'y2': df["MOVIMENTI"]
-            # })
-
-            # df_bar = df.iloc[::10, :]
-
-            # fig = {
-            #     'data': [
-            #         go.Scatter(  # linea
-            #             x=df['x'],
-            #             y=df['y1'],
-            #             mode='lines',
-            #             name='Linea'
-            #         ),
-            #         go.Bar(  # barre
-            #             x=df_bar['x'],
-            #             y=df_bar['y2'],
-            #             name='Barre',
-            #             width=3
-            #         )
-            #     ],
-            #     'layout': go.Layout(
-            #         title='Linea e Barre su un Unico Grafico',
-            #         xaxis={'title': 'Data'},
-            #         yaxis={'title': 'Valore'}
-            #     )
-            # }
-            
-            
-            
-            
-            
-            
+ 
             
 
         else:

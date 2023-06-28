@@ -155,7 +155,7 @@ def EseguiAnalisi (input_motore):
         print("MWRR_annualizzato " + str(risultati_performance[isin]["MWRR_annualizzato"] * 100))
         print("Volatilita_finale " + str(risultati_performance[isin]["Volatilita_finale"] * 100))
         print("Max_DD " + str(risultati_performance[isin]["Max_DD"] * 100))
-        
+        print("")
     
     
     
@@ -172,8 +172,9 @@ def EseguiAnalisi (input_motore):
     elaborazione = funzioni_motore.CalcolaPerformancePortafolgio(dati_input_portafolgio)
     
     
-    
+    print("RISULTATI PORTAFOLGIO")
     print(elaborazione)
+    
     
     
     return elaborazione
