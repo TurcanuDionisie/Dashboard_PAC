@@ -12,28 +12,44 @@
 
 
 /*prima colonna*/
-.wide-column {
-    width: 70%;
+.peso-isin {
+	text-align: right;
+    padding-right: 10px;  /* adjust as needed */
 }
 
 
-/*seconda colonna*/
-.narrow-column {
-    width: 30%;
+.input-form-pesi {
+	max-width: 150px;
 }
 
 
-/*
-.input-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.input-form{
+	width: 100%;
 }
 
-*/
+
+.btn{
+	width: 100%;
+}
 
 
 
+.label {
+    padding-right: 10px;
+}
+.text-right {
+    text-align: right;
+}
+.input-group .col-6 {
+    width: 50%;
+}
+.dash-core-components .Select, .dash-core-components .Select div, .dash-core-components .Select input {
+    width: 100% !important;
+}
+.dash-core-components .Select.is-focused:not(.is-open) > .Select-control {
+    border-color: #96d38c !important;
+    box-shadow: none !important;
+}
 
 
 

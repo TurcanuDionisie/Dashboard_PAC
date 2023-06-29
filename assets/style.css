@@ -12,25 +12,27 @@
 
 
 /*prima colonna*/
-.wide-column {
-    width: 70%;
+.peso-isin {
+	text-align: right;
+    padding-right: 10px;  /* adjust as needed */
 }
 
 
-/*seconda colonna*/
-.narrow-column {
-    width: 30%;
+.input-form-pesi {
+	max-width: 150px;
 }
 
 
-/*
-.input-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.input-form{
+	width: 100%;
 }
 
-*/
+
+.btn{
+	width: 100%;
+	margin-top: 5px;
+}
+
 
 
 .label {

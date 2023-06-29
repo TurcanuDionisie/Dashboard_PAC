@@ -155,7 +155,7 @@ app.layout = html.Div(className="container", children=[
     html.Div(className="row", children=[
         
         # First column
-        html.Div(className="col-8", children=[
+        html.Div(className="col-6", children=[
             html.Div(className="input-group", children=[
                 html.Div(className="col-6", children=html.P("Data Inizio:", className="label text-right")),
                 html.Div(className="col-6", children=dcc.Dropdown(
@@ -169,7 +169,8 @@ app.layout = html.Div(className="container", children=[
                 html.Div(className="col-6", children=dcc.Input(
                     id='importo-rata',
                     type='text',
-                    placeholder='Importo rata'
+                    placeholder='Importo rata',
+                    className='input-form form-control'
                 ))
             ]),
             html.Div(className="input-group", children=[
@@ -225,18 +226,26 @@ app.layout = html.Div(className="container", children=[
                     multi=True
                 ))
             ]),
-            html.Button('Calcola', id='calcola', n_clicks=0)
+            
+            
+            html.Div(className="input-group", children=[
+                html.Div(className="col-6"),
+                html.Div(className="col-6", children=html.Button('Calcola', id='calcola', n_clicks=0, className="btn btn-primary btn-lg btn-block"))
+            ]),
+            
+            
+            
+            
         ]),
         # Second column
-        html.Div(className="col-4", children=[
+        html.Div(className="col-6", children=[
             html.Table(id='my-table', children=[])
         ]),
     ]),
     
     
     
-    html.Div(children=html.Div(id='dummy-output')),  # dummy component used for button callback
-    html.Div(children=dcc.Store(id='store-inputs', data={})),  # storage component to store input values
+   
     html.Div(id='error-message'),
 
     dcc.Graph(id='result-graph'),
@@ -247,6 +256,9 @@ app.layout = html.Div(className="container", children=[
 
     dcc.Tabs(id="my-tabs"),
     
+    
+    html.Div(children=html.Div(id='dummy-output')),  # dummy component used for button callback
+    html.Div(children=dcc.Store(id='store-inputs', data={})),  # storage component to store input values
     
 ])
 
@@ -294,15 +306,17 @@ def update_table(selected_values, data):
         rows = []
         for i, value in enumerate(selected_values):
             row = html.Tr(children=[
-                html.Td(className='wide-column', children=value),
-                html.Td(className='narrow-column', children=dcc.Input(
+                html.Td(className='col-3 peso-isin', children=value),
+                html.Td(className='col', children=dcc.Input(
                     value=data.get(value, ""),
                     id={'type': 'dynamic-input', 'index': value},  # use value as id index
-                    type='text'
+                    type='text',
+                    className='input-form-pesi form-control'  # Add the full-width-input class here
                 ))
             ])
             rows.append(row)
         return rows
+
     
     
 
