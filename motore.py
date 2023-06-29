@@ -93,6 +93,8 @@ def EseguiAnalisi (input_motore):
     #calcola costi
     costi = funzioni_motore.calcola_costi(dati_input_costi)
     
+    print(costi)
+    
 
     
     #controlla importo rata minima

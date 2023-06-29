@@ -201,7 +201,7 @@ app.layout = html.Div(className="container", children=[
                 ))
             ]),
             html.Div(className="input-group", children=[
-                html.Div(className="col-6", children=html.P("gggggggggg:", className="label text-right")),
+                html.Div(className="col-6", children=html.P("Giorno Versamento:", className="label text-right")),
                 html.Div(className="col-6", children=dcc.Dropdown(
                     id='gggggggggg', 
                     options=[
@@ -367,9 +367,9 @@ def update_table(selected_values, data):
      Input('frequenza', 'value'),
      Input('durata', 'value'),
      Input('deroga', 'value'),
-     Input('multi-dropdown', 'value')
+     Input('multi-dropdown', 'value'),
+     Input('store-inputs', 'data')
      ],
-    [State('store-inputs', 'data')]
 )
 def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, deroga, finestre, isin_selezionati):
     message = ""
@@ -379,150 +379,148 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
     tabs = {}
 
     if n_clicks > 0:
-
-        #controlla che la somma dei pesi sia 100
-        # if(funzioni_dashboard.controlloSommaPesi(isin_selezionati)):
-        if(True):
-                        
-            
-            #input inseriti dall'utente
-            input_utente = {
-                "isin_selezionati": isin_selezionati,
-                "data_inizio": data_inizio,
-                "importo_rata": importo_rata,
-                "frequenza": frequenza,
-                "durata_anni": durata,
-                "giorno_mese":"8"
-            }
-            
-            
-            
-            #passo tutti gli input utente al motore
-            risultati = motore.EseguiAnalisi(input_utente)
-            
-            
-            
-            #controlla importo minimo rate
-            if(risultati == "ERRORE RATA MENSILE"):
-                message = "IMPORTO RATA NON RISPETTA IMPORTO MINIMO"
-            elif(risultati == "ERRORE IMPORTO MINIMO"):
-                message = "IMPORTO MINIMO SU UN FONDO NON RISPETTATO"
-            
-            else:
-                
-                grafico_ptf = risultati["portafoglio"]["Grafico"]
-    
-                grafico_ptf = pd.DataFrame({
-                    'x': grafico_ptf.index,
-                    'y1': grafico_ptf["CTV_NETTO"],
-                    'y2': grafico_ptf["MOVIMENTI"]
-                })
-    
-                df_bar = grafico_ptf.iloc[::10, :]
-    
-                fig = {
-                    'data': [
-                        go.Scatter(  # linea
-                            x=grafico_ptf['x'],
-                            y=grafico_ptf['y1'],
-                            mode='lines',
-                            name='Linea'
-                        ),
-                        go.Bar(  # barre
-                            x=df_bar['x'],
-                            y=df_bar['y2'],
-                            name='Barre',
-                            width=3
-                        )
-                    ],
-                    'layout': go.Layout(
-                        title='Linea e Barre su un Unico Grafico',
-                        xaxis={'title': 'Data'},
-                        yaxis={'title': 'Valore'}
-                    )
-                }
-            
-            
-            
-                dati_tabella_perf = {
-                    
-                    "Frequenza Rate": frequenza,
-                    "Importo Rata": importo_rata,
-                    "Totale Rate Versate": risultati["portafoglio"]["Totale rate versate"],
-                    "Patrimonio Finale": round(risultati["portafoglio"]["patrimonio finale"],2),
-                    "Plus/Minus": round(risultati["portafoglio"]["plus"] ,2),
-                    "MWRR Totale": round(risultati["portafoglio"]["MWRR"] * 100 ,2),
-                    "MWRR Annualizzato": round(risultati["portafoglio"]["MWRR_annualizzato"] * 100 ,2),
-                    "Volatilita": round(risultati["portafoglio"]["Volatilita_finale"] * 100 ,2),
-                    "Max DD": round(risultati["portafoglio"]["Max_DD"] * 100 ,2)
-                    
-                }
-                
-            
-            
-                # Code to create the table
-                table = html.Table([
-                    html.Tbody([
-                        html.Tr([
-                            html.Th(col),
-                            html.Td(dati_tabella_perf[col])
-                        ]) for col in dati_tabella_perf.keys()
-                    ])
-                ])
-                
-                
-
-                
-                
-            
-            
-
-            pie_chart = go.Figure()
-
-            labels = ["Versato", "Contributo Mercato"]
-            values = [risultati["portafoglio"]["Totale rate versate"], (risultati["portafoglio"]["patrimonio finale"] - risultati["portafoglio"]["Totale rate versate"])]
-    
-            pie_chart.add_trace(go.Pie(labels=labels, values=values))
-            
-            
-            if finestre is None or len(finestre) == 0:
-                return []
-            else:
-                tabs = []
-                for i, value in enumerate(finestre):
-                    
-                    # value = isin del fondo
-                    
-                    
-                    
-                   
-                    # Your data
-                    x_values = risultati["singoli_fondi"][value]["Calcoli"].index
-                    y_values1 = risultati["singoli_fondi"][value]["Calcoli"][value]
-                    y_values2 = risultati["singoli_fondi"][value]["Calcoli"]["PMC"]
-                    y_values3 = risultati["singoli_fondi"][value]["Calcoli"]["Prezzo_medio"]
-                    
-                    trace1 = go.Scatter(x=x_values, y=y_values1, mode='lines', name='Prezzo')
-                    trace2 = go.Scatter(x=x_values, y=y_values2, mode='lines', name='PMC')
-                    trace3 = go.Scatter(x=x_values, y=y_values3, mode='lines', name='Prezzo medio')
-                    
-                    data = [trace1, trace2, trace3]
-                    
-                    
-                    tab = dcc.Tab(label=value, children=[
-                        
-                        dcc.Graph(
-                            id={'type': 'dynamic-graph', 'index': value},
-                            figure={'data': data, 
-                                    'layout': go.Layout(title='My Plot', xaxis=dict(title='X'), yaxis=dict(title='Y'))}
-                        )
-                    ])
-                    tabs.append(tab)
- 
-            
-
+        
+        if data_inizio is None or importo_rata is None or finestre is None or isin_selezionati is None:
+            message = "Attenzione, non hai compilato tutti i campi"
+        
         else:
-            message = "Errori nei pesi"
+
+            #controlla che la somma dei pesi sia 100
+            if(funzioni_dashboard.controlloSommaPesi(isin_selezionati)):
+    
+                            
+                
+                #input inseriti dall'utente
+                input_utente = {
+                    "isin_selezionati": isin_selezionati,
+                    "data_inizio": data_inizio,
+                    "importo_rata": importo_rata,
+                    "frequenza": frequenza,
+                    "durata_anni": durata,
+                    "giorno_mese":"8"
+                }
+                
+                
+                
+                #passo tutti gli input utente al motore
+                risultati = motore.EseguiAnalisi(input_utente)
+                
+                
+                
+                #controlla importo minimo rate
+                if(risultati == "ERRORE RATA MENSILE"):
+                    message = "Attenzione, l'importo della rata è troppo piccolo"
+                elif(risultati == "ERRORE IMPORTO MINIMO"):
+                    message = "Attenzione, l'importo minimo su uno dei fondi è troppo piccolo"
+                
+                else:
+                    
+                    grafico_ptf = risultati["portafoglio"]["Grafico"]
+        
+                    grafico_ptf = pd.DataFrame({
+                        'x': grafico_ptf.index,
+                        'y1': grafico_ptf["CTV_NETTO"],
+                        'y2': grafico_ptf["MOVIMENTI"]
+                    })
+        
+                    df_bar = grafico_ptf.iloc[::10, :]
+        
+                    fig = {
+                        'data': [
+                            go.Scatter(  # linea
+                                x=grafico_ptf['x'],
+                                y=grafico_ptf['y1'],
+                                mode='lines',
+                                name='Linea'
+                            ),
+                            go.Bar(  # barre
+                                x=df_bar['x'],
+                                y=df_bar['y2'],
+                                name='Barre',
+                                width=3
+                            )
+                        ],
+                        'layout': go.Layout(
+                            title='Linea e Barre su un Unico Grafico',
+                            xaxis={'title': 'Data'},
+                            yaxis={'title': 'Valore'}
+                        )
+                    }
+                
+                
+                
+                    dati_tabella_perf = {
+                        
+                        "Frequenza Rate": frequenza,
+                        "Importo Rata": importo_rata,
+                        "Totale Rate Versate": risultati["portafoglio"]["Totale rate versate"],
+                        "Patrimonio Finale": round(risultati["portafoglio"]["patrimonio finale"],2),
+                        "Plus/Minus": round(risultati["portafoglio"]["plus"] ,2),
+                        "MWRR Totale": round(risultati["portafoglio"]["MWRR"] * 100 ,3),
+                        "MWRR Annualizzato": round(risultati["portafoglio"]["MWRR_annualizzato"] * 100 ,3),
+                        "Volatilita": round(risultati["portafoglio"]["Volatilita_finale"] * 100 ,3),
+                        "Max DD": round(risultati["portafoglio"]["Max_DD"] * 100 ,3)
+                        
+                    }
+                    
+                
+                
+                    # Code to create the table
+                    table = html.Table([
+                        html.Tbody([
+                            html.Tr([
+                                html.Th(col),
+                                html.Td(dati_tabella_perf[col])
+                            ]) for col in dati_tabella_perf.keys()
+                        ])
+                    ])
+                    
+    
+                    pie_chart = go.Figure()
+        
+                    labels = ["Versato", "Contributo Mercato"]
+                    values = [risultati["portafoglio"]["Totale rate versate"], (risultati["portafoglio"]["patrimonio finale"] - risultati["portafoglio"]["Totale rate versate"])]
+            
+                    pie_chart.add_trace(go.Pie(labels=labels, values=values))
+                    
+                    
+                    if finestre is None or len(finestre) == 0:
+                        return []
+                    else:
+                        tabs = []
+                        for i, value in enumerate(finestre):
+                            
+                            # value = isin del fondo
+                            
+                            
+                            
+                           
+                            # Your data
+                            x_values = risultati["singoli_fondi"][value]["Calcoli"].index
+                            y_values1 = risultati["singoli_fondi"][value]["Calcoli"][value]
+                            y_values2 = risultati["singoli_fondi"][value]["Calcoli"]["PMC"]
+                            y_values3 = risultati["singoli_fondi"][value]["Calcoli"]["Prezzo_medio"]
+                            
+                            trace1 = go.Scatter(x=x_values, y=y_values1, mode='lines', name='Prezzo')
+                            trace2 = go.Scatter(x=x_values, y=y_values2, mode='lines', name='PMC')
+                            trace3 = go.Scatter(x=x_values, y=y_values3, mode='lines', name='Prezzo medio')
+                            
+                            data = [trace1, trace2, trace3]
+                            
+                            
+                            tab = dcc.Tab(label=value, children=[
+                                
+                                dcc.Graph(
+                                    id={'type': 'dynamic-graph', 'index': value},
+                                    figure={'data': data, 
+                                            'layout': go.Layout(title='My Plot', xaxis=dict(title='X'), yaxis=dict(title='Y'))}
+                                )
+                            ])
+                            tabs.append(tab)
+     
+    
+            else:
+                message = "Attenzione, la somma dei pesi non è 100"
 
     return fig, None, message, table, pie_chart, tabs    # Returns figure to the graph, None to the 'dummy-output', and the error message to 'error-message'.
 
