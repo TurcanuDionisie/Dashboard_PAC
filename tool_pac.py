@@ -245,17 +245,49 @@ app.layout = html.Div(className="container", children=[
     
     
     
-   
-    html.Div(id='error-message'),
-
-    dcc.Graph(id='result-graph'),
-
-    html.Div(id='table-div'),
-
-    dcc.Graph(id='pie-chart'),  # The new pie chart graph
-
-    dcc.Tabs(id="my-tabs"),
     
+    html.Div(className="row", children=[
+        
+        html.Div(id='error-message'),
+        
+    ]),
+    
+    
+    
+    html.Div(className="row", children=[
+        
+        dcc.Graph(id='result-graph'),
+        
+    ]),
+    
+    
+    
+    
+    html.Div(className="row", children=[
+        
+        html.Div(className="col-6", children=[
+            html.Div(id='table-div'),
+        ]),
+        
+        html.Div(className="col-6", children=[
+           dcc.Graph(id='pie-chart'),
+        ]),
+        
+        
+    ]),
+    
+   
+    
+    html.Div(className="row", children=[
+        
+        dcc.Tabs(id="my-tabs"),
+        
+    ]),
+    
+
+
+    
+
     
     html.Div(children=html.Div(id='dummy-output')),  # dummy component used for button callback
     html.Div(children=dcc.Store(id='store-inputs', data={})),  # storage component to store input values
@@ -430,13 +462,18 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             
                 # Code to create the table
                 table = html.Table([
-                    html.Thead(
-                        html.Tr([html.Th(col) for col in dati_tabella_perf.keys()])
-                    ),
                     html.Tbody([
-                        html.Tr([html.Td(v) for v in dati_tabella_perf.values()])
+                        html.Tr([
+                            html.Th(col),
+                            html.Td(dati_tabella_perf[col])
+                        ]) for col in dati_tabella_perf.keys()
                     ])
                 ])
+                
+                
+
+                
+                
             
             
 

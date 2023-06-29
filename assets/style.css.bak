@@ -30,6 +30,7 @@
 
 .btn{
 	width: 100%;
+	margin-top: 5px;
 }
 
 
@@ -54,3 +55,13 @@
 
 
 
+.table-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.table-container table {
+  margin-top: auto; /* Push the table to the center vertically */
+}
