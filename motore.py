@@ -175,11 +175,22 @@ def EseguiAnalisi (input_motore):
     elaborazione = funzioni_motore.CalcolaPerformancePortafolgio(dati_input_portafolgio)
     
     
+    
+    
+    # in risultati_performance ho quello che mi serve per disegnare i grafici nelle tabs
+    
+    
+    risultato_motore = {
+        "portafoglio": elaborazione,
+        "grafici_fondi": risultati_performance
+    }
+    
+    
     print("RISULTATI PORTAFOLGIO")
     print(elaborazione)
     
     
     
-    return elaborazione
+    return risultato_motore
     
     

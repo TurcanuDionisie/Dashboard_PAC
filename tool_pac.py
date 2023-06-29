@@ -293,6 +293,8 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
     message = ""
     fig = {}
     table = {}
+    pie_chart = {}
+    tabs = {}
 
     if n_clicks > 0:
 
@@ -317,6 +319,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             risultati = motore.EseguiAnalisi(input_utente)
             
             
+            
             #controlla importo minimo rate
             if(risultati == "ERRORE RATA MENSILE"):
                 message = "IMPORTO RATA NON RISPETTA IMPORTO MINIMO"
@@ -325,7 +328,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             
             else:
                 
-                grafico_ptf = risultati["Grafico"]
+                grafico_ptf = risultati["portafoglio"]["Grafico"]
     
                 grafico_ptf = pd.DataFrame({
                     'x': grafico_ptf.index,
@@ -363,13 +366,13 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
                     
                     "Frequenza Rate": frequenza,
                     "Importo Rata": importo_rata,
-                    "Totale Rate Versate": risultati["Totale rate versate"],
-                    "Patrimonio Finale": round(risultati["patrimonio finale"],2),
-                    "Plus/Minus": round(risultati["plus"] ,2),
-                    "MWRR Totale": round(risultati["MWRR"] * 100 ,2),
-                    "MWRR Annualizzato": round(risultati["MWRR_annualizzato"] * 100 ,2),
-                    "Volatilita": round(risultati["Volatilita_finale"] * 100 ,2),
-                    "Max DD": round(risultati["Max_DD"] * 100 ,2)
+                    "Totale Rate Versate": risultati["portafoglio"]["Totale rate versate"],
+                    "Patrimonio Finale": round(risultati["portafoglio"]["patrimonio finale"],2),
+                    "Plus/Minus": round(risultati["portafoglio"]["plus"] ,2),
+                    "MWRR Totale": round(risultati["portafoglio"]["MWRR"] * 100 ,2),
+                    "MWRR Annualizzato": round(risultati["portafoglio"]["MWRR_annualizzato"] * 100 ,2),
+                    "Volatilita": round(risultati["portafoglio"]["Volatilita_finale"] * 100 ,2),
+                    "Max DD": round(risultati["portafoglio"]["Max_DD"] * 100 ,2)
                     
                 }
                 
@@ -390,7 +393,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             pie_chart = go.Figure()
 
             labels = ["Versato", "Contributo Mercato"]
-            values = [risultati["Totale rate versate"], (risultati["patrimonio finale"] - risultati["Totale rate versate"])]
+            values = [risultati["portafoglio"]["Totale rate versate"], (risultati["portafoglio"]["patrimonio finale"] - risultati["portafoglio"]["Totale rate versate"])]
     
             pie_chart.add_trace(go.Pie(labels=labels, values=values))
             
@@ -400,10 +403,29 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             else:
                 tabs = []
                 for i, value in enumerate(finestre):
+                    
+                    # value = isin del fondo
+                    
+                    
+                    # Your data
+                    x_values = [1, 2, 3, 4, 5]
+                    y_values1 = [1, 3, 2, 3, 1]
+                    y_values2 = [2, 3, 4, 3, 2]
+                    y_values3 = [5, 3, 4, 2, 1]
+                    
+                    trace1 = go.Scatter(x=x_values, y=y_values1, mode='lines', name='line1')
+                    trace2 = go.Scatter(x=x_values, y=y_values2, mode='lines', name='line2')
+                    trace3 = go.Scatter(x=x_values, y=y_values3, mode='lines', name='line3')
+                    
+                    data = [trace1, trace2, trace3]
+                    
+                    
                     tab = dcc.Tab(label=value, children=[
+                        
                         dcc.Graph(
-                            id={'type': 'dynamic-graph', 'index': value},  # usa il valore come indice dell'id
-                            # assuming you will update this graph in another callback
+                            id={'type': 'dynamic-graph', 'index': value},
+                            figure={'data': data, 
+                                    'layout': go.Layout(title='My Plot', xaxis=dict(title='X'), yaxis=dict(title='Y'))}
                         )
                     ])
                     tabs.append(tab)
