@@ -182,7 +182,7 @@ def EseguiAnalisi (input_motore):
     
     risultato_motore = {
         "portafoglio": elaborazione,
-        "grafici_fondi": risultati_performance
+        "singoli_fondi": risultati_performance
     }
     
     

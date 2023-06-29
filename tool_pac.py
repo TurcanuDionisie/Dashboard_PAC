@@ -407,15 +407,17 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
                     # value = isin del fondo
                     
                     
-                    # Your data
-                    x_values = [1, 2, 3, 4, 5]
-                    y_values1 = [1, 3, 2, 3, 1]
-                    y_values2 = [2, 3, 4, 3, 2]
-                    y_values3 = [5, 3, 4, 2, 1]
                     
-                    trace1 = go.Scatter(x=x_values, y=y_values1, mode='lines', name='line1')
-                    trace2 = go.Scatter(x=x_values, y=y_values2, mode='lines', name='line2')
-                    trace3 = go.Scatter(x=x_values, y=y_values3, mode='lines', name='line3')
+                   
+                    # Your data
+                    x_values = risultati["singoli_fondi"][value]["Calcoli"].index
+                    y_values1 = risultati["singoli_fondi"][value]["Calcoli"][value]
+                    y_values2 = risultati["singoli_fondi"][value]["Calcoli"]["PMC"]
+                    y_values3 = risultati["singoli_fondi"][value]["Calcoli"]["Prezzo_medio"]
+                    
+                    trace1 = go.Scatter(x=x_values, y=y_values1, mode='lines', name='Prezzo')
+                    trace2 = go.Scatter(x=x_values, y=y_values2, mode='lines', name='PMC')
+                    trace3 = go.Scatter(x=x_values, y=y_values3, mode='lines', name='Prezzo medio')
                     
                     data = [trace1, trace2, trace3]
                     

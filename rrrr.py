@@ -298,6 +298,8 @@ max_dd = min(quote['MAX DD'])
 
 
 
+
+
 #COLONNA QUOTE
 quote["Quote"] = quote['MOVIMENTO_NETTO'] / quote[quote.columns[0]]
 
