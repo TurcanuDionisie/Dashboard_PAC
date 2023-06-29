@@ -1,0 +1,40 @@
+
+.row > .col,
+.row > [class*='col-'] {
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+
+#my-table {
+    width: 100%;
+}
+
+
+/*prima colonna*/
+.wide-column {
+    width: 70%;
+}
+
+
+/*seconda colonna*/
+.narrow-column {
+    width: 30%;
+}
+
+
+/*
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+*/
+
+
+
+
+
+
+

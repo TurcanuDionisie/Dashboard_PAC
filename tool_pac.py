@@ -112,8 +112,15 @@ selezione_deroga = {
 
 #%% DASHBOARD
 
-app = dash.Dash(__name__, 
-                title ='Tool PAC')
+app = dash.Dash(__name__, title ='Tool PAC', external_stylesheets=[dbc.themes.BOOTSTRAP])
+
+
+
+app.css.append_css({
+    'external_url': '/assets/style.css'
+})
+
+
 server = app.server
 
 # Add the following line to set the favicon
@@ -144,83 +151,111 @@ app.index_string = '''
 
 
 
-app.layout = html.Div([
-    dcc.Dropdown(
-        id='basic-dropdown',
-        options=[{'label': key, 'value': key} for key in basic_options.keys()],
-        value='Opzione 1'  # valore iniziale
-    ),
-    dcc.Dropdown(
-        id='multi-dropdown',
-        multi=True
-    ),
-    html.Table(id='my-table', children=[]),
-    html.Div(id='dummy-output'),  # componente "dummy" usato per il callback del pulsante
-    dcc.Store(id='store-inputs', data={}),  # componente di storage per conservare i valori di input
-    
-    
-    #data inizio
-    dcc.Dropdown(
-        id='data-inizio',
-        options=[{'label': str(date), 'value': str(date)} for date in datetime_index],
-        value=None
-    ),
-    
-    
-    #importo rata
-    dcc.Input(
-    id='importo-rata',
-    type='text',
-    placeholder='Importo rata'
-    ),
-    
-    
-    #frequenza
-    dcc.Dropdown(
-    id='frequenza', 
-    options=[{'label': label, 'value': value} for label, value in frequenze.items()],
-    value='Mensile',  # Puoi impostare il valore predefinito qui
-    ),
-    
-    
-    #durata
-    dcc.Dropdown(
-    id='durata', 
-    options=[
-            {'label': '10 Anni', 'value': '10'},
-            {'label': '15 Anni', 'value': '15'},
-        ],
-    value='10',  # Puoi impostare il valore predefinito qui
-    ),
-    
-    
-    #deroga
-    dcc.Dropdown(
-        id='deroga',
-        options=[{'label': str(deroga), 'value': str(deroga)} for deroga in selezione_deroga],
-        value='Nessuna'
-    ),
-    
-    
-    html.Button('Calcola', id='calcola', n_clicks=0),  # aggiungi il pulsante
-    html.Div(id='error-message'),
-    
-    
-    dcc.Graph(id='result-graph'),
-    
-    html.Div(id='table-div'),
+app.layout = html.Div(className="container", children=[
+    html.Div(className="row", children=[
         
+        # First column
+        html.Div(className="col-8", children=[
+            html.Div(className="input-group", children=[
+                html.Div(className="col-6", children=html.P("Data Inizio:", className="label text-right")),
+                html.Div(className="col-6", children=dcc.Dropdown(
+                    id='data-inizio',
+                    options=[{'label': str(date), 'value': str(date)} for date in datetime_index],
+                    value=None
+                ))
+            ]),
+            html.Div(className="input-group", children=[
+                html.Div(className="col-6", children=html.P("Importo Rata:", className="label text-right")),
+                html.Div(className="col-6", children=dcc.Input(
+                    id='importo-rata',
+                    type='text',
+                    placeholder='Importo rata'
+                ))
+            ]),
+            html.Div(className="input-group", children=[
+                html.Div(className="col-6", children=html.P("Frequenza:", className="label text-right")),
+                html.Div(className="col-6", children=dcc.Dropdown(
+                    id='frequenza', 
+                    options=[{'label': label, 'value': value} for label, value in frequenze.items()],
+                    value='Mensile',
+                ))
+            ]),
+            html.Div(className="input-group", children=[
+                html.Div(className="col-6", children=html.P("Durata:", className="label text-right")),
+                html.Div(className="col-6", children=dcc.Dropdown(
+                    id='durata', 
+                    options=[
+                            {'label': '10 Anni', 'value': '10'},
+                            {'label': '15 Anni', 'value': '15'},
+                        ],
+                    value='10',
+                ))
+            ]),
+            html.Div(className="input-group", children=[
+                html.Div(className="col-6", children=html.P("Deroga:", className="label text-right")),
+                html.Div(className="col-6", children=dcc.Dropdown(
+                    id='deroga',
+                    options=[{'label': str(deroga), 'value': str(deroga)} for deroga in selezione_deroga],
+                    value='Nessuna'
+                ))
+            ]),
+            html.Div(className="input-group", children=[
+                html.Div(className="col-6", children=html.P("gggggggggg:", className="label text-right")),
+                html.Div(className="col-6", children=dcc.Dropdown(
+                    id='gggggggggg', 
+                    options=[
+                            {'label': '8', 'value': '8'},
+                            {'label': '28', 'value': '28'},
+                        ],
+                    value='10',
+                ))
+            ]),
+            html.Div(className="input-group", children=[
+                html.Div(className="col-6", children=html.P("Basic Dropdown:", className="label text-right")),
+                html.Div(className="col-6", children=dcc.Dropdown(
+                    id='basic-dropdown',
+                    options=[{'label': key, 'value': key} for key in basic_options.keys()],
+                    value='Opzione 1',
+                ))
+            ]),
+            html.Div(className="input-group", children=[
+                html.Div(className="col-6", children=html.P("Multi Dropdown:", className="label text-right")),
+                html.Div(className="col-6", children=dcc.Dropdown(
+                    id='multi-dropdown',
+                    multi=True
+                ))
+            ]),
+            html.Button('Calcola', id='calcola', n_clicks=0)
+        ]),
+        # Second column
+        html.Div(className="col-4", children=[
+            html.Table(id='my-table', children=[])
+        ]),
+    ]),
     
-    dcc.Graph(id='pie-chart'),  # The new pie chart graph
     
-    dcc.Tabs(id="my-tabs"),
     
+    html.Div(children=html.Div(id='dummy-output')),  # dummy component used for button callback
+    html.Div(children=dcc.Store(id='store-inputs', data={})),  # storage component to store input values
+    html.Div(id='error-message'),
 
+    dcc.Graph(id='result-graph'),
+
+    html.Div(id='table-div'),
+
+    dcc.Graph(id='pie-chart'),  # The new pie chart graph
+
+    dcc.Tabs(id="my-tabs"),
     
     
 ])
 
 
+
+
+
+
+    
 
 
 
@@ -244,7 +279,8 @@ def update_store(input_values, input_ids, data):
 def update_multi_dropdown(selected_value):
     return basic_options.get(selected_value, []), []
 
-# Aggiorna la tabella con i nuovi input ogni volta che si modifica il valore del dropdown
+
+
 @app.callback(
     Output('my-table', 'children'),
     [Input('multi-dropdown', 'value')],
@@ -258,10 +294,10 @@ def update_table(selected_values, data):
         rows = []
         for i, value in enumerate(selected_values):
             row = html.Tr(children=[
-                html.Td(children=value),
-                html.Td(children=dcc.Input(
+                html.Td(className='wide-column', children=value),
+                html.Td(className='narrow-column', children=dcc.Input(
                     value=data.get(value, ""),
-                    id={'type': 'dynamic-input', 'index': value},  # usa il valore come indice dell'id
+                    id={'type': 'dynamic-input', 'index': value},  # use value as id index
                     type='text'
                 ))
             ])
