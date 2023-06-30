@@ -294,6 +294,7 @@ app.layout = html.Div(className="container", children=[
     
     
     
+    #TABELLA PERFORMANCE E GRAFICO A TORTA
     html.Div(className="row align-vertical sezione", children=[
         
         html.H3('Valori alla data finale della simulazione', style={'text-align': 'center', 'width': '100%'}),
@@ -434,7 +435,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
     #controlla che la somma dei pesi sia 100
     #ritorna false se l'utente non inserisce un numero valido
     if(controlloSommaPesi(isin_peso) == False):
-        message = "Attenzione, la somma dei pesi non è 0"
+        message = "Attenzione, la somma dei pesi non è 100"
         return fig, None, message, table, pie_chart, tabs
         
     
