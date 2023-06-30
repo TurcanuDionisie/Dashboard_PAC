@@ -189,12 +189,19 @@ app.layout = html.Div(className="container", children=[
             ]),
             html.Div(className="input-group", children=[
                 html.Div(className="col-6", children=html.P("Importo Rata:", className="label text-right")),
-                html.Div(className="col-6", children=dcc.Input(
-                    id='importo-rata',
-                    type='text',
-                    placeholder='Importo rata',
-                    className='input-form form-control'
-                ))
+
+                             
+                html.Div(className="col-6", children=dbc.InputGroup([
+                    dcc.Input(
+                        id='importo-rata',
+                        type='text',
+                        placeholder='Importo rata',
+                        className='input-form form-control'
+                    ),
+                    dbc.InputGroupText("€")
+                ], className='input-group'))
+                
+                
             ]),
             html.Div(className="input-group", children=[
                 html.Div(className="col-6", children=html.P("Frequenza:", className="label text-right")),
@@ -357,7 +364,6 @@ def update_multi_dropdown(selected_value):
     Output('my-table', 'children'),
     [Input('multi-dropdown', 'value'),
      Input('store-inputs', 'data')]
-    
 )
 def update_table(selected_values, data):
     if selected_values is None or len(selected_values) == 0:
@@ -368,16 +374,18 @@ def update_table(selected_values, data):
         for i, value in enumerate(selected_values):
             row = html.Tr(children=[
                 html.Td(className='col-3 peso-isin', children=value),
-                html.Td(className='col', children=dcc.Input(
-                    value=data.get(value, ""),
-                    id={'type': 'dynamic-input', 'index': value},  
-                    type='text',
-                    className='input-form-pesi form-control'  
-                ))
+                html.Td(className='col', children=dbc.InputGroup([
+                    dcc.Input(
+                        value=data.get(value, ""),
+                        id={'type': 'dynamic-input', 'index': value},  
+                        type='text',
+                        className='form-control input-form-pesi'  # Here, you apply the Bootstrap class to the input component
+                    ),
+                    dbc.InputGroupText("%")
+                ], className='input-group'))  # And you apply other Bootstrap classes to the InputGroup component
             ])
             rows.append(row)
         return rows
-
     
     
 
@@ -488,19 +496,54 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
 
     df_bar = grafico_ptf.iloc[::10, :]
 
+
+
+    # VECCHIA VERSIONE DEL GRAFICO
+    # fig = {
+    #     'data': [
+    #         go.Scatter(  # linea
+    #             x=grafico_ptf['x'],
+    #             y=grafico_ptf['y1'],
+    #             mode='lines',
+    #             name='Controvalore Netto',
+    #             hovertemplate='%{y:.2f}',  # add this line
+    #         ),
+    #         go.Bar(  # barre
+    #             x=df_bar['x'],
+    #             y=df_bar['y2'],
+    #             name='Importo Versato',
+    #             width=3,
+    #             hovertemplate='%{y:.2f}',  # add this line
+    #         )
+    #     ],
+    #     'layout': go.Layout(
+    #         title='Grafico della simulazione',
+    #         title_font=dict(
+    #         size=25,
+    #         family="Verdana, bold"
+    #     ),
+    #         yaxis={'title': 'Valore'}
+    #     )
+    # }
+    
+    
+    
+    
     fig = {
         'data': [
             go.Scatter(  # linea
                 x=grafico_ptf['x'],
                 y=grafico_ptf['y1'],
                 mode='lines',
-                name='Controvalore Netto'
+                name='Controvalore Netto',
+                hovertemplate='%{y:.2f}',  # add this line
             ),
             go.Bar(  # barre
                 x=df_bar['x'],
                 y=df_bar['y2'],
                 name='Importo Versato',
-                width=3
+                width=3,
+                hovertemplate='%{y:.2f}',  # add this line
             )
         ],
         'layout': go.Layout(
@@ -509,7 +552,8 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             size=25,
             family="Verdana, bold"
         ),
-            yaxis={'title': 'Valore'}
+            yaxis={'title': 'Valore'},
+            hovermode='x unified'  # add this line
         )
     }
 
