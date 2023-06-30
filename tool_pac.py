@@ -82,7 +82,7 @@ df_options = pd.DataFrame({
 
 df_suboptions = pd.DataFrame({
     'OptionID': file_codifiche_prodotto['FAMIGLIA'],
-    'SubOptionLabel': file_codifiche_prodotto.index,
+    'SubOptionLabel': file_codifiche_prodotto['NOME'],
     'SubOptionValue': file_codifiche_prodotto.index,
 })
 
@@ -180,18 +180,16 @@ app.layout = html.Div(className="container", children=[
         # Prima colonna
         html.Div(className="col-6", children=[
             html.Div(className="input-group", children=[
-                html.Div(className="col-6", children=html.P("Data Inizio:", className="label text-right")),
-                html.Div(className="col-6", children=dcc.Dropdown(
+                html.Div(className="col-4", children=html.P("Data Inizio:", className="label text-right")),
+                html.Div(className="col-8", children=dcc.Dropdown(
                     id='data-inizio',
                     options=[{'label': str(date), 'value': str(date)} for date in data_inizio_simulazione],
                     value=None
                 ))
             ]),
             html.Div(className="input-group", children=[
-                html.Div(className="col-6", children=html.P("Importo Rata:", className="label text-right")),
-
-                             
-                html.Div(className="col-6", children=dbc.InputGroup([
+                html.Div(className="col-4", children=html.P("Importo Rata:", className="label text-right")),
+                html.Div(className="col-8", children=dbc.InputGroup([
                     dcc.Input(
                         id='importo-rata',
                         type='text',
@@ -204,16 +202,16 @@ app.layout = html.Div(className="container", children=[
                 
             ]),
             html.Div(className="input-group", children=[
-                html.Div(className="col-6", children=html.P("Frequenza:", className="label text-right")),
-                html.Div(className="col-6", children=dcc.Dropdown(
+                html.Div(className="col-4", children=html.P("Frequenza:", className="label text-right")),
+                html.Div(className="col-8", children=dcc.Dropdown(
                     id='frequenza', 
                     options=[{'label': label, 'value': value} for label, value in frequenze.items()],
                     value='Mensile',
                 ))
             ]),
             html.Div(className="input-group", children=[
-                html.Div(className="col-6", children=html.P("Durata:", className="label text-right")),
-                html.Div(className="col-6", children=dcc.Dropdown(
+                html.Div(className="col-4", children=html.P("Durata:", className="label text-right")),
+                html.Div(className="col-8", children=dcc.Dropdown(
                     id='durata', 
                     options=[
                             {'label': '10 Anni', 'value': '10'},
@@ -223,16 +221,16 @@ app.layout = html.Div(className="container", children=[
                 ))
             ]),
             html.Div(className="input-group", children=[
-                html.Div(className="col-6", children=html.P("Deroga:", className="label text-right")),
-                html.Div(className="col-6", children=dcc.Dropdown(
+                html.Div(className="col-4", children=html.P("Deroga:", className="label text-right")),
+                html.Div(className="col-8", children=dcc.Dropdown(
                     id='deroga',
                     options=[{'label': str(deroga), 'value': str(deroga)} for deroga in selezione_deroga],
                     value='Nessuna'
                 ))
             ]),
             html.Div(className="input-group", children=[
-                html.Div(className="col-6", children=html.P("Giorno Versamento:", className="label text-right")),
-                html.Div(className="col-6", children=dcc.Dropdown(
+                html.Div(className="col-4", children=html.P("Giorno Versamento:", className="label text-right")),
+                html.Div(className="col-8", children=dcc.Dropdown(
                     id='giorno_versamento', 
                     options=[
                             {'label': '8', 'value': '8'},
@@ -242,16 +240,16 @@ app.layout = html.Div(className="container", children=[
                 ))
             ]),
             html.Div(className="input-group", children=[
-                html.Div(className="col-6", children=html.P("Prodotto:", className="label text-right")),
-                html.Div(className="col-6", children=dcc.Dropdown(
+                html.Div(className="col-4", children=html.P("Prodotto:", className="label text-right")),
+                html.Div(className="col-8", children=dcc.Dropdown(
                     id='basic-dropdown',
                     options=[{'label': key, 'value': key} for key in basic_options.keys()],
                     value='Opzione 1',
                 ))
             ]),
             html.Div(className="input-group", children=[
-                html.Div(className="col-6", children=html.P("Fondo Comume:", className="label text-right")),
-                html.Div(className="col-6", children=dcc.Dropdown(
+                html.Div(className="col-4", children=html.P("Fondo Comume:", className="label text-right")),
+                html.Div(className="col-8", children=dcc.Dropdown(
                     id='multi-dropdown',
                     multi=True
                 ))
@@ -259,8 +257,8 @@ app.layout = html.Div(className="container", children=[
             
             
             html.Div(className="input-group", children=[
-                html.Div(className="col-6"),
-                html.Div(className="col-6", children=html.Button('Calcola', id='calcola', n_clicks=0, className="btn btn-primary btn-lg btn-block"))
+                html.Div(className="col-4"),
+                html.Div(className="col-8", children=html.Button('Calcola', id='calcola', n_clicks=0, className="btn btn-primary btn-lg btn-block"))
             ]),
             
             
