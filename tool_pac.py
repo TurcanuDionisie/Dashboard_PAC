@@ -150,7 +150,7 @@ app.layout = html.Div(className="container", children=[
     #INPUT FORM
     html.Div(className="row sezione", children=[
         
-        # First column
+        # Prima colonna
         html.Div(className="col-6", children=[
             html.Div(className="input-group", children=[
                 html.Div(className="col-6", children=html.P("Data Inizio:", className="label text-right")),
@@ -233,7 +233,7 @@ app.layout = html.Div(className="container", children=[
             
             
         ]),
-        # Second column
+        # Seconda colonna
         html.Div(className="col-6", children=[
             html.Table(id='my-table', children=[])
         ]),
@@ -242,6 +242,7 @@ app.layout = html.Div(className="container", children=[
     
     
     
+    #MESSAGGIO ERRORE
     html.Div(className="row", children=[
         
         html.Div(id='error-message'),
@@ -250,6 +251,7 @@ app.layout = html.Div(className="container", children=[
     
     
     
+    #GRAFICO SIMULAZIONE
     html.Div(className="row sezione", children=[
         
         # html.H3('Grafico della simulazione', style={'text-align': 'center', 'width': '100%'}),
@@ -260,6 +262,7 @@ app.layout = html.Div(className="container", children=[
     
     
     
+    #TABELLA PERFORMANCE E GRAFICO A TORTA
     html.Div(className="row align-vertical sezione", children=[
         
         html.H3('Valori alla data finale della simulazione', style={'text-align': 'center', 'width': '100%'}),
@@ -276,6 +279,8 @@ app.layout = html.Div(className="container", children=[
     
    
     
+    
+    #TABS CON I VARI GRAFICI
     html.Div(className="row sezione", children=[
         
         dcc.Tabs(id="my-tabs"),
@@ -286,7 +291,7 @@ app.layout = html.Div(className="container", children=[
 
     
 
-    
+    #COMPONENTI CHE CONSERVANO I PESI
     html.Div(children=html.Div(id='dummy-output')),  # dummy component used for button callback
     html.Div(children=dcc.Store(id='store-inputs', data={})),  # storage component to store input values
     
@@ -295,13 +300,10 @@ app.layout = html.Div(className="container", children=[
 
 
 
+# %% CALLBACKS
 
 
-    
-
-
-
-# Aggiungi un callback per ogni input generato dinamicamente
+# GESTISCE I DUE DROPDOWN
 @app.callback(
     Output('store-inputs', 'data'),
     [Input({'type': 'dynamic-input', 'index': ALL}, 'value')],
@@ -312,7 +314,6 @@ def update_store(input_values, input_ids, data):
     data = {id['index']: value for value, id in zip(input_values, input_ids)}
     return data
 
-# Aggiorna le opzioni del multi-dropdown in base al valore del basic-dropdown
 @app.callback(
     Output('multi-dropdown', 'options'),
     Output('multi-dropdown', 'value'),
@@ -323,6 +324,8 @@ def update_multi_dropdown(selected_value):
 
 
 
+
+#GESTISCE TABELLA DINAMICA DEI PESI
 @app.callback(
     Output('my-table', 'children'),
     [Input('multi-dropdown', 'value')],
@@ -351,7 +354,7 @@ def update_table(selected_values, data):
     
 
 
-
+#MOTORE
 @app.callback(
     [Output('result-graph', 'figure'),
      Output('dummy-output', 'children'),
