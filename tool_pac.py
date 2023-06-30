@@ -124,9 +124,9 @@ selezione_deroga = {
     'Iniziale 75%': 'Iniziale 75%',
     'Iniziale 100%': 'Iniziale 75%',
     'Totale 25%': 'Totale 25%',
-    'Totale 50%': 'Iniziale 50%',
-    'Totale 75%': 'Iniziale 75%',
-    'Totale 100%': 'Iniziale 75%',
+    'Totale 50%': 'Totale 50%',
+    'Totale 75%': 'Totale 75%',
+    'Totale 100%': 'Totale 100%',
 }
 
 
@@ -439,6 +439,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
         
     # estrae e formatta input inseriti dall'utente   
     try:
+        
         input_utente = {
             "isin_selezionati": isin_peso,
             "data_inizio": data_inizio,
@@ -446,9 +447,10 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             "frequenza": frequenza,
             "durata_anni": int(durata),
             "giorno_mese": int(giorno_versamento),
+            "deroga": deroga,
             
             #dati letti da excel
-            "file_quote": file_quote,
+            "file_quote": file_quote[file_quote.index >= data_inizio],
             "file_costi": file_costi
             
         }

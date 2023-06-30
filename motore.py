@@ -47,9 +47,37 @@ def EseguiAnalisi (input_motore):
     data_inizio = input_motore['data_inizio']
     
     
-    #deroga ancora da gestire
-    deroga_iniziale = 1
-    deroga_totale = 1
+    
+    deroga = input_motore['deroga']
+    
+    #DEROGA
+    if deroga == 'Nessuna':
+        deroga_iniziale = 1
+        deroga_totale = 1
+    elif deroga == 'Iniziale 25%':
+        deroga_iniziale = 0.75
+        deroga_totale = 1
+    elif deroga == 'Iniziale 50%':
+        deroga_iniziale = 0.5
+        deroga_totale = 1
+    elif deroga == 'Iniziale 75%':
+        deroga_iniziale = 0.25
+        deroga_totale = 1
+    elif deroga == 'Iniziale 100%':
+        deroga_iniziale = 0
+        deroga_totale = 1
+    elif deroga == 'Totale 25%':
+        deroga_iniziale = 1
+        deroga_totale = 0.75
+    elif deroga == 'Totale 50%':
+        deroga_iniziale = 1
+        deroga_totale = 0.5
+    elif deroga == 'Totale 75%':
+        deroga_iniziale = 1
+        deroga_totale = 0.25
+    elif deroga == 'Totale 100%':
+        deroga_iniziale = 1
+        deroga_totale = 0
     
     
     
