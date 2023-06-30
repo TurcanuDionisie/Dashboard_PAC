@@ -152,6 +152,10 @@ app.index_string = '''
 
 
 app.layout = html.Div(className="container", children=[
+    
+    html.H1('Dashboard Piano PAC', style={'textAlign': 'center', 'width': '100%', 'marginTop': '40px'}),
+
+    
     html.Div(className="row sezione", children=[
         
         # First column
@@ -212,7 +216,7 @@ app.layout = html.Div(className="container", children=[
                 ))
             ]),
             html.Div(className="input-group", children=[
-                html.Div(className="col-6", children=html.P("Basic Dropdown:", className="label text-right")),
+                html.Div(className="col-6", children=html.P("Prodotto:", className="label text-right")),
                 html.Div(className="col-6", children=dcc.Dropdown(
                     id='basic-dropdown',
                     options=[{'label': key, 'value': key} for key in basic_options.keys()],
@@ -220,7 +224,7 @@ app.layout = html.Div(className="container", children=[
                 ))
             ]),
             html.Div(className="input-group", children=[
-                html.Div(className="col-6", children=html.P("Multi Dropdown:", className="label text-right")),
+                html.Div(className="col-6", children=html.P("Fondo Comume:", className="label text-right")),
                 html.Div(className="col-6", children=dcc.Dropdown(
                     id='multi-dropdown',
                     multi=True
