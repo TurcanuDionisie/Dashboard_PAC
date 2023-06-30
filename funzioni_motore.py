@@ -1,10 +1,6 @@
 import pandas as pd
 import numpy as np
-import os
 
-
-folder_path = r"C:\Users\Dionisie.Turcanu\Documents\GitHub\Dashboard_PAC"
-os.chdir(folder_path)
 
 
 
@@ -41,7 +37,7 @@ def calcola_costi(dati_input):
     
     #estrazione dati in input
     fondi = dati_input["fondi"]
-    file_decodifiche = dati_input["file_decodifiche"]
+    file_costi = dati_input["file_costi"]
     importo_rata_mensile = dati_input["importo_rata_mensile"]
     importo_totale_rate = dati_input["importo_totale_rate"]
     investimento_iniziale = dati_input["investimento_iniziale"]
@@ -63,7 +59,7 @@ def calcola_costi(dati_input):
     # se c'è più di un fondo selezionato, controlla importi minimo
     if(len(importo_fondi) > 1):
         for isin in importo_fondi:
-            if(importo_fondi[isin] < file_decodifiche['RATA_MINIMA_MULTIFONDO'].loc[isin]):
+            if(importo_fondi[isin] < file_costi['RATA_MINIMA_MULTIFONDO'].loc[isin]):
                 print("IMPORTO MINIMO NON RISPETTATO " + isin)
                 return "ERRORE IMPORTO MINIMO"
 
@@ -71,13 +67,13 @@ def calcola_costi(dati_input):
     # CALCOLA COSTI SOTTOSCRIZIONE
     importo_totale = importo_totale_rate + investimento_iniziale
     isin = list(fondi)[0]
-    costi_sottoscrizione = file_decodifiche[fasciaCostiSottoscrizione(importo_totale, file_decodifiche.loc[isin])].loc[isin]
+    costi_sottoscrizione = file_costi[fasciaCostiSottoscrizione(importo_totale, file_costi.loc[isin])].loc[isin]
 
 
     # CALCOLA DIRITTI FISSI INIZIALI E COSTANTI
-    diritti_fissi = file_decodifiche["DIRITTO_FISSO"].loc[isin]
-    fascia_diritti_fissi = fasciaDirittiFissi(investimento_iniziale, file_decodifiche.loc[isin])
-    diritti_fissi_iniziali = file_decodifiche[fascia_diritti_fissi].loc[isin]
+    diritti_fissi = file_costi["DIRITTO_FISSO"].loc[isin]
+    fascia_diritti_fissi = fasciaDirittiFissi(investimento_iniziale, file_costi.loc[isin])
+    diritti_fissi_iniziali = file_costi[fascia_diritti_fissi].loc[isin]
 
 
     # se il costo è in percentuale allora trasformalo in euro
@@ -181,7 +177,7 @@ def calcola_performance(dati_input):
     
     # MOVIMENTI
     movimenti = pd.DataFrame(index=quote.index)
-    movimenti['Movimenti'] = 0
+    movimenti['movimenti'] = 0
     
     # Assegna l'investimento iniziale alla prima data
     movimenti.iloc[0] = investimento_iniziale
@@ -225,24 +221,24 @@ def calcola_performance(dati_input):
     
     
     # COSTI UP1
-    quote['COSTI UP1'] = np.nan
+    quote['costi_up1'] = np.nan
     
     # Trova gli indici dei movimenti
-    movimenti_index = quote[quote['Movimenti'] != 0].index
+    movimenti_index = quote[quote['movimenti'] != 0].index
     
     # Applica la prima fetta
-    quote.loc[movimenti_index[0], 'COSTI UP1'] = prima_fetta
+    quote.loc[movimenti_index[0], 'costi_up1'] = prima_fetta
     
     # Applica la seconda fetta sui successivi 6 movimenti
     for i in range(1, 7):
         if i < len(movimenti_index):  # Verifica che ci sia un movimento
-            quote.loc[movimenti_index[i], 'COSTI UP1'] = seconda_fetta / 6
+            quote.loc[movimenti_index[i], 'costi_up1'] = seconda_fetta / 6
     
     # Applica la terza fetta sui movimenti rimanenti
     num_movimenti_rimanenti = len(movimenti_index) - 7
     for i in range(7, len(movimenti_index)):
         if i < len(movimenti_index):  # Verifica che ci sia un movimento
-            quote.loc[movimenti_index[i], 'COSTI UP1'] = terza_fetta / num_movimenti_rimanenti
+            quote.loc[movimenti_index[i], 'costi_up1'] = terza_fetta / num_movimenti_rimanenti
     
     
     
@@ -252,17 +248,17 @@ def calcola_performance(dati_input):
     
     # COSTI UP3
     
-    quote['COSTI UP3'] = np.nan
+    quote['costi_up3'] = np.nan
     
     # Trova gli indici dei movimenti
-    movimenti_index = quote[quote['Movimenti'] != 0].index
+    movimenti_index = quote[quote['movimenti'] != 0].index
     
     # Applica il diritto fisso iniziale
-    quote.loc[movimenti_index[0], 'COSTI UP3'] = diritto_fisso_iniziale
+    quote.loc[movimenti_index[0], 'costi_up3'] = diritto_fisso_iniziale
     
     # Applica il diritto fisso a tutti gli altri movimenti
     for i in range(1, len(movimenti_index)):
-        quote.loc[movimenti_index[i], 'COSTI UP3'] = diritto_fisso
+        quote.loc[movimenti_index[i], 'costi_up3'] = diritto_fisso
         
         
         
@@ -270,7 +266,7 @@ def calcola_performance(dati_input):
     
         
     # MOVIMENTO NETTO
-    quote["MOVIMENTO_NETTO"] = quote["Movimenti"] - quote["COSTI UP1"] - quote["COSTI UP3"]
+    quote["movimento_netto"] = quote["movimenti"] - quote["costi_up1"] - quote["costi_up3"]
     
     
     
@@ -279,80 +275,80 @@ def calcola_performance(dati_input):
     # CTV LORDO
     quote = quote.fillna(0)
     
-    quote['CTV_LORDO'] = np.nan
+    quote['ctv_lordo'] = np.nan
     
     # Trova gli indici dei movimenti
-    movimenti_index = quote[quote['Movimenti'] != 0].index
+    movimenti_index = quote[quote['movimenti'] != 0].index
     
     # Applica il primo valore dei movimenti
-    quote.loc[movimenti_index[0], 'CTV_LORDO'] = quote.loc[movimenti_index[0], 'Movimenti']
+    quote.loc[movimenti_index[0], 'ctv_lordo'] = quote.loc[movimenti_index[0], 'movimenti']
     
     # Calcola CTV_LORDO per tutte le altre righe
     for i in range(1, len(quote.index)):
-        ctv_precedente = quote.loc[quote.index[i-1], 'CTV_LORDO']
+        ctv_precedente = quote.loc[quote.index[i-1], 'ctv_lordo']
         quote_precedente = quote.loc[quote.index[i-1], quote.columns[0]]
         quote_corrispettivo = quote.loc[quote.index[i], quote.columns[0]]
-        movimento_corrispettivo = quote.loc[quote.index[i], 'Movimenti']
+        movimento_corrispettivo = quote.loc[quote.index[i], 'movimenti']
     
-        quote.loc[quote.index[i], 'CTV_LORDO'] = (ctv_precedente * quote_corrispettivo / quote_precedente) + movimento_corrispettivo
+        quote.loc[quote.index[i], 'ctv_lordo'] = (ctv_precedente * quote_corrispettivo / quote_precedente) + movimento_corrispettivo
     
       
     
     
     # CTV NETTO
-    quote['CTV_NETTO'] = np.nan
+    quote['ctv_netto'] = np.nan
     
     # Trova gli indici dei movimenti
-    movimenti_index = quote[quote['MOVIMENTO_NETTO'] != 0].index
+    movimenti_index = quote[quote['movimento_netto'] != 0].index
     
     # Applica il primo valore dei movimenti
-    quote.loc[movimenti_index[0], 'CTV_NETTO'] = quote.loc[movimenti_index[0], 'MOVIMENTO_NETTO']
+    quote.loc[movimenti_index[0], 'ctv_netto'] = quote.loc[movimenti_index[0], 'movimento_netto']
     
     # Calcola CTV_LORDO per tutte le altre righe
     for i in range(1, len(quote.index)):
-        ctv_precedente = quote.loc[quote.index[i-1], 'CTV_NETTO']
+        ctv_precedente = quote.loc[quote.index[i-1], 'ctv_netto']
         quote_precedente = quote.loc[quote.index[i-1], quote.columns[0]]
         quote_corrispettivo = quote.loc[quote.index[i], quote.columns[0]]
-        movimento_corrispettivo = quote.loc[quote.index[i], 'MOVIMENTO_NETTO']
+        movimento_corrispettivo = quote.loc[quote.index[i], 'movimento_netto']
     
-        quote.loc[quote.index[i], 'CTV_NETTO'] = (ctv_precedente * quote_corrispettivo / quote_precedente) + movimento_corrispettivo
+        quote.loc[quote.index[i], 'ctv_netto'] = (ctv_precedente * quote_corrispettivo / quote_precedente) + movimento_corrispettivo
         
         
         
         
     max_date = quote.index.max()
-    quote['Numeri'] = quote['Movimenti'] * (max_date - quote.index).days
+    quote['numeri'] = quote['movimenti'] * (max_date - quote.index).days
     
     
     
     totale_dovuto = importo_totale_rate + investimento_iniziale
-    quote['CTV Complessivo'] = quote['CTV_NETTO'] + totale_dovuto - quote['MOVIMENTO_NETTO'].cumsum()
+    quote['ctv_complessivo'] = quote['ctv_netto'] + totale_dovuto - quote['movimento_netto'].cumsum()
     
     
-    quote['VOL'] = quote['CTV Complessivo'].pct_change()
-    
-    
-    
-    quote['MAX DD'] = quote['CTV_NETTO'] / quote['MOVIMENTO_NETTO'].cumsum() - 1
+    quote['vol'] = quote['ctv_complessivo'].pct_change()
     
     
     
+    quote['max_dd'] = quote['ctv_netto'] / quote['movimento_netto'].cumsum() - 1
     
-    volatilita = quote['CTV Complessivo'].resample('M').last().pct_change()
     
-    totale_rate_versate = sum(quote['Movimenti'])
     
-    patrimonio_finale = quote['CTV_NETTO'].iloc[-1]
+    
+    volatilita = quote['ctv_complessivo'].resample('M').last().pct_change()
+    
+    totale_rate_versate = sum(quote['movimenti'])
+    
+    patrimonio_finale = quote['ctv_netto'].iloc[-1]
     
     plus = patrimonio_finale - totale_rate_versate
     
-    mwrr = plus / (sum(quote['Numeri']) / (quote.index[-1] - quote.index[0]).days)
+    mwrr = plus / (sum(quote['numeri']) / (quote.index[-1] - quote.index[0]).days)
     
     mwrr_annualizzato = ((1 + mwrr) ** (365 / (quote.index[-1] - quote.index[0]).days)) - 1
     
     volatilita_finale = np.std(volatilita) * np.sqrt(12)
     
-    max_dd = min(quote['MAX DD'])
+    max_dd = min(quote['max_dd'])
     
     
     
@@ -360,50 +356,50 @@ def calcola_performance(dati_input):
     
     
     #COLONNA QUOTE
-    quote["Quote"] = quote['MOVIMENTO_NETTO'] / quote[quote.columns[0]]
+    quote["quote"] = quote['movimento_netto'] / quote[quote.columns[0]]
 
 
     #COLONNA QUOTE CUMULATE
-    quote["Quote Cumulate"] = quote["Quote"].cumsum()
+    quote["quote_cumulate"] = quote["quote"].cumsum()
 
 
 
     # COLONNA PMC
     indici = quote.index.tolist()
 
-    quote['PMC'] = np.nan
-    quote.at[indici[0], 'PMC'] = quote.loc[indici[0], quote.columns[0]]
+    quote['pmc'] = np.nan
+    quote.at[indici[0], 'pmc'] = quote.loc[indici[0], quote.columns[0]]
 
     for i in range(1, len(quote)):
-        prev_pmc = quote.at[indici[i - 1], 'PMC']
-        prev_cum_quote = quote.at[indici[i - 1], 'Quote Cumulate']
+        prev_pmc = quote.at[indici[i - 1], 'pmc']
+        prev_cum_quote = quote.at[indici[i - 1], 'quote_cumulate']
         curr_val_quota = quote.at[indici[i], quote.columns[0]]
-        curr_quote = quote.at[indici[i], 'Quote']
-        curr_cum_quote = quote.at[indici[i], 'Quote Cumulate']
-        quote.at[indici[i], 'PMC'] = ((prev_pmc * prev_cum_quote) + (curr_val_quota * curr_quote)) / curr_cum_quote
+        curr_quote = quote.at[indici[i], 'quote']
+        curr_cum_quote = quote.at[indici[i], 'quote_cumulate']
+        quote.at[indici[i], 'pmc'] = ((prev_pmc * prev_cum_quote) + (curr_val_quota * curr_quote)) / curr_cum_quote
 
 
 
     # Applico np.where per sostituire i valori di VAL_QUOTA con NaN quando Movimenti è 0
-    quote['VAL_QUOTA_FILT'] = np.where(quote['Movimenti'] != 0, quote[quote.columns[0]], np.nan)
+    quote['val_quota_filtrati'] = np.where(quote['movimenti'] != 0, quote[quote.columns[0]], np.nan)
 
     # Calcolo la media cumulativa, ignorando i NaN
-    quote['Prezzo_medio'] = quote['VAL_QUOTA_FILT'].expanding().mean()
+    quote['prezzo_medio'] = quote['val_quota_filtrati'].expanding().mean()
 
 
     
     
     risultato = {
-        "Totale rate versate": totale_rate_versate,
-        "patrimonio finale": patrimonio_finale,
+        "totale_rate_versate": totale_rate_versate,
+        "patrimonio_finale": patrimonio_finale,
         "plus": plus,
-        "MWRR": mwrr,
-        "MWRR_annualizzato": mwrr_annualizzato,
-        "Volatilita_finale": volatilita_finale,
-        "Max_DD": max_dd,
+        "mwrr": mwrr,
+        "mwrr_annualizzato": mwrr_annualizzato,
+        "volatilita_finale": volatilita_finale,
+        "max_dd": max_dd,
         
         #salvo tutti i passaggi perchè servono per altri calcoli
-        "Calcoli": quote
+        "calcoli": quote
     }
     
     
@@ -421,8 +417,8 @@ def CalcolaPerformancePortafolgio(dati_input):
     investimento_iniziale = dati_input["investimento_iniziale"]
 
 
-    indici = risultati_performance[next(iter(risultati_performance))]["Calcoli"].index
-    colonne = ['Movimenti', 'MOVIMENTO_NETTO', 'CTV_LORDO', 'CTV_NETTO']
+    indici = risultati_performance[next(iter(risultati_performance))]["calcoli"].index
+    colonne = ['movimenti', 'movimento_netto', 'ctv_lordo', 'ctv_netto']
 
 
     portafolgio = pd.DataFrame(columns=colonne, index=indici).fillna(0)
@@ -430,61 +426,70 @@ def CalcolaPerformancePortafolgio(dati_input):
 
 
     for isin in risultati_performance:
-        portafolgio["Movimenti"] += risultati_performance[isin]["Calcoli"]["Movimenti"]
-        portafolgio["MOVIMENTO_NETTO"] += risultati_performance[isin]["Calcoli"]["MOVIMENTO_NETTO"]
-        portafolgio["CTV_LORDO"] += risultati_performance[isin]["Calcoli"]["CTV_LORDO"]
-        portafolgio["CTV_NETTO"] += risultati_performance[isin]["Calcoli"]["CTV_NETTO"]
+        portafolgio["movimenti"] += risultati_performance[isin]["calcoli"]["movimenti"]
+        portafolgio["movimento_netto"] += risultati_performance[isin]["calcoli"]["movimento_netto"]
+        portafolgio["ctv_lordo"] += risultati_performance[isin]["calcoli"]["ctv_lordo"]
+        portafolgio["ctv_netto"] += risultati_performance[isin]["calcoli"]["ctv_netto"]
 
 
 
 
     max_date = portafolgio.index.max()
-    portafolgio['Numeri'] = portafolgio['Movimenti'] * (max_date - portafolgio.index).days
-
-
+    portafolgio['numeri'] = portafolgio['movimenti'] * (max_date - portafolgio.index).days
+    
+    
+    
     totale_dovuto = importo_totale_rate + investimento_iniziale
-    portafolgio['CTV Complessivo'] = portafolgio['CTV_NETTO'] + totale_dovuto - portafolgio['MOVIMENTO_NETTO'].cumsum()
-
-
-    portafolgio['VOL'] = portafolgio['CTV Complessivo'].pct_change()
-
-    portafolgio['MAX DD'] = portafolgio['CTV_NETTO'] / portafolgio['MOVIMENTO_NETTO'].cumsum() - 1
-
-
-    volatilita = portafolgio['CTV Complessivo'].resample('M').last().pct_change()
-
-    totale_rate_versate = sum(portafolgio['Movimenti'])
-
-    patrimonio_finale = portafolgio['CTV_NETTO'].iloc[-1]
-
+    portafolgio['ctv_complessivo'] = portafolgio['ctv_netto'] + totale_dovuto - portafolgio['movimento_netto'].cumsum()
+    
+    
+    portafolgio['vol'] = portafolgio['ctv_complessivo'].pct_change()
+    
+    
+    
+    portafolgio['max_dd'] = portafolgio['ctv_netto'] / portafolgio['movimento_netto'].cumsum() - 1
+    
+    
+    
+    
+    volatilita = portafolgio['ctv_complessivo'].resample('M').last().pct_change()
+    
+    totale_rate_versate = sum(portafolgio['movimenti'])
+    
+    patrimonio_finale = portafolgio['ctv_netto'].iloc[-1]
+    
     plus = patrimonio_finale - totale_rate_versate
-
-    mwrr = plus / (sum(portafolgio['Numeri']) / (portafolgio.index[-1] - portafolgio.index[0]).days)
-
+    
+    mwrr = plus / (sum(portafolgio['numeri']) / (portafolgio.index[-1] - portafolgio.index[0]).days)
+    
     mwrr_annualizzato = ((1 + mwrr) ** (365 / (portafolgio.index[-1] - portafolgio.index[0]).days)) - 1
-
+    
     volatilita_finale = np.std(volatilita) * np.sqrt(12)
-
-    max_dd = min(portafolgio['MAX DD'])
+    
+    max_dd = min(portafolgio['max_dd'])
     
     
     
     
     #Dati per grafico portafolgio
     grafico = pd.DataFrame()
-    grafico["CTV_NETTO"] = portafolgio['CTV_NETTO']
-    grafico["MOVIMENTI"] = portafolgio["Movimenti"].cumsum()
+    grafico["ctv_netto"] = portafolgio['ctv_netto']
+    grafico["movimenti"] = portafolgio["movimenti"].cumsum()
     
 
     risultato = {
-        "Totale rate versate": totale_rate_versate,
-        "patrimonio finale": patrimonio_finale,
+        "totale_rate_versate": totale_rate_versate,
+        "patrimonio_finale": patrimonio_finale,
         "plus": plus,
-        "MWRR": mwrr,
-        "MWRR_annualizzato": mwrr_annualizzato,
-        "Volatilita_finale": volatilita_finale,
-        "Max_DD": max_dd,
-        "Grafico": grafico
+        "mwrr": mwrr,
+        "mwrr_annualizzato": mwrr_annualizzato,
+        "volatilita_finale": volatilita_finale,
+        "max_dd": max_dd,
+        
+        #dati per grafico portafoglio
+        "grafico": grafico
     }
+    
+
     
     return risultato

@@ -1,18 +1,8 @@
 import pandas as pd
 import numpy as np
-import os
+
 
 import funzioni_motore
-
-
-folder_path = r"C:\Users\Dionisie.Turcanu\Documents\GitHub\Dashboard_PAC"
-os.chdir(folder_path)
-
-
-
-#lettura file input
-file_decodifiche = pd.read_excel('costi.xlsx', index_col=0)
-base_dati = pd.read_excel('DB_TOT_PROXY.xlsx', index_col=0)
 
 
 
@@ -32,7 +22,6 @@ frequenze = {
 
 
 
-
 def EseguiAnalisi (input_motore):
     
     
@@ -42,11 +31,17 @@ def EseguiAnalisi (input_motore):
     }
     
     
+    
+    #ESTRAZIONE DATI RICEVUTI IN INPUT
+    
+    file_quote = input_motore['file_quote']
+    file_costi = input_motore['file_costi']
+    
     #estrazione dati input utente (tutti)
     frequenza =  input_motore['frequenza']
-    importo_rata = float(input_motore['importo_rata'])
-    durata_anni = float(input_motore['durata_anni'])
-    giorno_del_mese = int(input_motore['giorno_mese'])
+    importo_rata = input_motore['importo_rata']
+    durata_anni = input_motore['durata_anni']
+    giorno_del_mese = input_motore['giorno_mese']
     
     #non ancora gestito
     data_inizio = input_motore['data_inizio']
@@ -57,6 +52,10 @@ def EseguiAnalisi (input_motore):
     deroga_totale = 1
     
     
+    
+
+    
+    #i pesi dei fondi inseriti dall'utente sono stringhe
     #trasformo pesi dei fondi da stringhe in float
     for isin in input_motore["isin_selezionati"]:
         fondi[isin] = float(input_motore["isin_selezionati"][isin])
@@ -81,7 +80,7 @@ def EseguiAnalisi (input_motore):
             "fondi": fondi,
             
             #file con tutte le fasce di costo
-            "file_decodifiche": file_decodifiche,
+            "file_costi": file_costi,
             
             #dati input utente
             'importo_rata_mensile': importo_rata_mensile,
@@ -93,11 +92,12 @@ def EseguiAnalisi (input_motore):
     #calcola costi
     costi = funzioni_motore.calcola_costi(dati_input_costi)
     
+    print("COSTI")
     print(costi)
     
 
     
-    #controlla importo rata minima
+    #prima di calcolare performance controlla importo rata minima
     #se non rispettato chiudi
     if costi == "ERRORE RATA MENSILE":
         return "ERRORE RATA MENSILE"
@@ -107,13 +107,16 @@ def EseguiAnalisi (input_motore):
     
     # se sono arrivato qua tutto apposto con le rate    
     
-    #tabella contenente le performance per ogni fondo selezionato
+    
+    
+    #salvo le performance per ogni fondo selezionato
+    #serviranno per il calcolo performance portafolgio e per le varie tabs
     risultati_performance = {}
 
 
     #per ogni fondo selezionato estraggo le quote e peso nel portafolgio
     for isin in fondi:
-        quote = base_dati[isin]
+        quote = file_quote[isin]
         peso = fondi[isin]
         
         
@@ -144,27 +147,18 @@ def EseguiAnalisi (input_motore):
         }
         
         
-        
-        #calcolo le performance di ogni fondo
+        #calcolo le performance del fondo
         risultati_performance[isin] = funzioni_motore.calcola_performance(dati_input_performance)
         
 
-        print(isin)
-        print("totale rate versate " + str(risultati_performance[isin]["Totale rate versate"]))
-        print("patrimonio finale " + str(risultati_performance[isin]["patrimonio finale"]))
-        print("plus " + str(risultati_performance[isin]["plus"]))
-        print("MWRR " + str(risultati_performance[isin]["MWRR"] * 100))
-        print("MWRR_annualizzato " + str(risultati_performance[isin]["MWRR_annualizzato"] * 100))
-        print("Volatilita_finale " + str(risultati_performance[isin]["Volatilita_finale"] * 100))
-        print("Max_DD " + str(risultati_performance[isin]["Max_DD"] * 100))
-        print("")
+
     
     
     
     
     
     
-    #dati input per portafolgio
+    #dati input per calcolo performance portafolgio
     dati_input_portafolgio = {
         
         "risultati_performance": risultati_performance,
@@ -179,19 +173,19 @@ def EseguiAnalisi (input_motore):
     
     
     
-    # in risultati_performance ho quello che mi serve per disegnare i grafici nelle tabs
+
     
-    
+    #contiene tutti i dati necessari per tutti i componenti
     risultato_motore = {
+        
+        #dati portafolgio
         "portafoglio": elaborazione,
+        
+        #dati singoli fondi
         "singoli_fondi": risultati_performance
     }
     
-    
-    print("RISULTATI PORTAFOLGIO")
-    print(elaborazione)
-    
-    
+        
     
     return risultato_motore
     

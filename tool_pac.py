@@ -28,18 +28,44 @@ import pandas as pd
 import plotly.graph_objects as go
 
 
-import funzioni_dashboard
 import motore
+
+
+
+#%% FUNZIONI PER DASHBOARD
+
+
+#Controlla che la somma dei pesi sia 100
+def controlloSommaPesi(pesi):
+    
+    somma_pesi = 0
+    
+    try:
+        for isin in pesi:
+            somma_pesi += int(pesi[isin])
+    
+    except:
+        return False
+    
+    if(somma_pesi != 100):
+        return False
+    
+    return True
+
 
 #%% LETTURA FILE EXCEL
 
 #decodifiche FONDO - Prodotto
-codifiche = pd.read_excel("codifiche.xlsx", index_col=0)
-SGR = codifiche['FAMIGLIA'].unique()
+file_codifiche_prodotto = pd.read_excel("codifiche.xlsx", index_col=0)
+SGR = file_codifiche_prodotto['FAMIGLIA'].unique()
 
 
 #lettura quote
-quote = pd.read_excel("DB_TOT_PROXY.xlsx", index_col=0)
+file_quote = pd.read_excel("DB_TOT_PROXY.xlsx", index_col=0)
+
+
+#lettura file costi
+file_costi = pd.read_excel('costi.xlsx', index_col=0)
 
 
 
@@ -54,9 +80,9 @@ df_options = pd.DataFrame({
 })
 
 df_suboptions = pd.DataFrame({
-    'OptionID': codifiche['FAMIGLIA'],
-    'SubOptionLabel': codifiche.index,
-    'SubOptionValue': codifiche.index,
+    'OptionID': file_codifiche_prodotto['FAMIGLIA'],
+    'SubOptionLabel': file_codifiche_prodotto.index,
+    'SubOptionValue': file_codifiche_prodotto.index,
 })
 
 basic_options = {}
@@ -71,7 +97,7 @@ for _, row in df_options.iterrows():
 
 
 #DATE INIZIO SIMULAZIONE
-data_inizio_simulazione = quote.index
+data_inizio_simulazione = file_quote.index
 
 
 
@@ -199,7 +225,7 @@ app.layout = html.Div(className="container", children=[
             html.Div(className="input-group", children=[
                 html.Div(className="col-6", children=html.P("Giorno Versamento:", className="label text-right")),
                 html.Div(className="col-6", children=dcc.Dropdown(
-                    id='gggggggggg', 
+                    id='giorno_versamento', 
                     options=[
                             {'label': '8', 'value': '8'},
                             {'label': '28', 'value': '28'},
@@ -307,8 +333,8 @@ app.layout = html.Div(className="container", children=[
 @app.callback(
     Output('store-inputs', 'data'),
     [Input({'type': 'dynamic-input', 'index': ALL}, 'value')],
-    [Input({'type': 'dynamic-input', 'index': ALL}, 'id')],
-    [State('store-inputs', 'data')]
+    [Input({'type': 'dynamic-input', 'index': ALL}, 'id'),
+     Input('store-inputs', 'data')]
 )
 def update_store(input_values, input_ids, data):
     data = {id['index']: value for value, id in zip(input_values, input_ids)}
@@ -328,8 +354,9 @@ def update_multi_dropdown(selected_value):
 #GESTISCE TABELLA DINAMICA DEI PESI
 @app.callback(
     Output('my-table', 'children'),
-    [Input('multi-dropdown', 'value')],
-    [State('store-inputs', 'data')]
+    [Input('multi-dropdown', 'value'),
+     Input('store-inputs', 'data')]
+    
 )
 def update_table(selected_values, data):
     if selected_values is None or len(selected_values) == 0:
@@ -342,9 +369,9 @@ def update_table(selected_values, data):
                 html.Td(className='col-3 peso-isin', children=value),
                 html.Td(className='col', children=dcc.Input(
                     value=data.get(value, ""),
-                    id={'type': 'dynamic-input', 'index': value},  # use value as id index
+                    id={'type': 'dynamic-input', 'index': value},  
                     type='text',
-                    className='input-form-pesi form-control'  # Add the full-width-input class here
+                    className='input-form-pesi form-control'  
                 ))
             ])
             rows.append(row)
@@ -368,174 +395,217 @@ def update_table(selected_values, data):
      Input('frequenza', 'value'),
      Input('durata', 'value'),
      Input('deroga', 'value'),
+     Input('giorno_versamento', 'value'),
+     
+     #isin selezionati (solo isin)
      Input('multi-dropdown', 'value'),
+     
+     #dizionario dove ad ogni isin è associato il peso
      Input('store-inputs', 'data')
      ],
 )
-def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, deroga, finestre, isin_selezionati):
+def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, deroga, giorno_versamento, isin_selezionati, isin_peso):
     message = ""
     fig = {}
     table = {}
     pie_chart = {}
     tabs = {}
 
-    if n_clicks > 0:
-        
-        if data_inizio is None or importo_rata is None or finestre is None or isin_selezionati is None:
-            message = "Attenzione, non hai compilato tutti i campi"
-        
-        else:
-
-            #controlla che la somma dei pesi sia 100
-            if(funzioni_dashboard.controlloSommaPesi(isin_selezionati)):
     
-                            
-                
-                #input inseriti dall'utente
-                input_utente = {
-                    "isin_selezionati": isin_selezionati,
-                    "data_inizio": data_inizio,
-                    "importo_rata": importo_rata,
-                    "frequenza": frequenza,
-                    "durata_anni": durata,
-                    "giorno_mese":"8"
-                }
-                
-                
-                
-                #passo tutti gli input utente al motore
-                risultati = motore.EseguiAnalisi(input_utente)
-                
-                
-                
-                #controlla importo minimo rate
-                if(risultati == "ERRORE RATA MENSILE"):
-                    message = "Attenzione, l'importo della rata è troppo piccolo"
-                elif(risultati == "ERRORE IMPORTO MINIMO"):
-                    message = "Attenzione, l'importo minimo su uno dei fondi è troppo piccolo"
-                
-                else:
-                    
-                    grafico_ptf = risultati["portafoglio"]["Grafico"]
+    if n_clicks <= 0:
+        return fig, None, message, table, pie_chart, tabs
         
-                    grafico_ptf = pd.DataFrame({
-                        'x': grafico_ptf.index,
-                        'y1': grafico_ptf["CTV_NETTO"],
-                        'y2': grafico_ptf["MOVIMENTI"]
-                    })
-        
-                    df_bar = grafico_ptf.iloc[::10, :]
-        
-                    fig = {
-                        'data': [
-                            go.Scatter(  # linea
-                                x=grafico_ptf['x'],
-                                y=grafico_ptf['y1'],
-                                mode='lines',
-                                name='Controvalore Netto'
-                            ),
-                            go.Bar(  # barre
-                                x=df_bar['x'],
-                                y=df_bar['y2'],
-                                name='Importo Versato',
-                                width=3
-                            )
-                        ],
-                        'layout': go.Layout(
-                            title='Grafico della simulazione',
-                            title_font=dict(
-                            size=25,
-                            family="Verdana, bold"
-                        ),
-                            yaxis={'title': 'Valore'}
-                        )
-                    }
-                
-                
-                
-                    dati_tabella_perf = {
-                        
-                        "Frequenza Rate": frequenza,
-                        "Importo Rata": str(importo_rata) + "€",
-                        "Totale Rate Versate": str(risultati["portafoglio"]["Totale rate versate"]) + "€",
-                        "Patrimonio Finale": str(int(risultati["portafoglio"]["patrimonio finale"])) + "€",
-                        "Plus/Minus": str(int(risultati["portafoglio"]["plus"])) + "€",
-                        "MWRR Totale": str(round(risultati["portafoglio"]["MWRR"] * 100 ,2)) + "%",
-                        "MWRR Annualizzato": str(round(risultati["portafoglio"]["MWRR_annualizzato"] * 100 ,2)) + "%",
-                        "Volatilita": str(round(risultati["portafoglio"]["Volatilita_finale"] * 100 ,2)) + "%",
-                        "Max DD": str(round(risultati["portafoglio"]["Max_DD"] * 100 ,2)) + "%"
-                        
-                    }
-                    
-                
-                
-                    # Code to create the table
-                    table = html.Table(className='my-table', children=[
-                        html.Tbody([
-                            html.Tr([
-                                html.Div(className='row', children=[
-                                    html.Div(className='col-6', children=[html.Th(col)]),
-                                    html.Div(className='col-6', children=[html.Td(dati_tabella_perf[col])])
-                                ])
-                            ]) for col in dati_tabella_perf.keys()
-                        ])
-                    ])
-                    
-                    
-                    
-
-                    
     
-                    pie_chart = go.Figure()
+    #controlla che i campi in input siano tutti compilati
+    if data_inizio is None or importo_rata is None or isin_selezionati is None or isin_peso is None:
+        message = "Attenzione, non hai compilato tutti i campi"
+        return fig, None, message, table, pie_chart, tabs
+    
+    
         
-                    labels = ["Versato", "Contributo Mercato"]
-                    values = [risultati["portafoglio"]["Totale rate versate"], (risultati["portafoglio"]["patrimonio finale"] - risultati["portafoglio"]["Totale rate versate"])]
+    #controlla che la somma dei pesi sia 100
+    #ritorna false se l'utente non inserisce un numero valido
+    if(controlloSommaPesi(isin_peso) == False):
+        message = "Attenzione, la somma dei pesi non è 0"
+        return fig, None, message, table, pie_chart, tabs
+        
+    
+    
+    
+    # input_utente = {
+    #     "isin_selezionati": isin_peso,
+    #     "data_inizio": data_inizio,
+    #     "importo_rata": importo_rata,
+    #     "frequenza": frequenza,
+    #     "durata_anni": durata,
+    #     "giorno_mese": giorno_versamento,
+        
+    #     #dati letti da excel
+    #     "file_quote": file_quote,
+    #     "file_costi": file_costi
+        
+    # }
+    
+    
+    # print(input_utente)
+    
+        
+        
+    # estrae e formatta input inseriti dall'utente   
+    try:
+        input_utente = {
+            "isin_selezionati": isin_peso,
+            "data_inizio": data_inizio,
+            "importo_rata": int(importo_rata),
+            "frequenza": frequenza,
+            "durata_anni": int(durata),
+            "giorno_mese": int(giorno_versamento),
             
-                    pie_chart.add_trace(go.Pie(labels=labels, values=values))
-                    
-                    
-                    if finestre is None or len(finestre) == 0:
-                        return []
-                    else:
-                        tabs = []
-                        for i, value in enumerate(finestre):
-                            
-                            # value = isin del fondo
-                            
-                            
-                            
-                           
-                            # Your data
-                            x_values = risultati["singoli_fondi"][value]["Calcoli"].index
-                            y_values1 = risultati["singoli_fondi"][value]["Calcoli"][value]
-                            y_values2 = risultati["singoli_fondi"][value]["Calcoli"]["PMC"]
-                            y_values3 = risultati["singoli_fondi"][value]["Calcoli"]["Prezzo_medio"]
-                            
-                            trace1 = go.Scatter(x=x_values, y=y_values1, mode='lines', name='Prezzo')
-                            trace2 = go.Scatter(x=x_values, y=y_values2, mode='lines', name='PMC')
-                            trace3 = go.Scatter(x=x_values, y=y_values3, mode='lines', name='Prezzo medio')
-                            
-                            data = [trace1, trace2, trace3]
-                            
-                            
-                            tab = dcc.Tab(label=value, children=[
-                                
-                                dcc.Graph(
-                                    id={'type': 'dynamic-graph', 'index': value},
-                                    figure={'data': data, 
-                                           }
-                                )
-                            ])
-                            tabs.append(tab)
-     
+            #dati letti da excel
+            "file_quote": file_quote,
+            "file_costi": file_costi
+            
+        }
+        
+    except:
+        message = "Attenzione, errore nei campi di input"
+        return fig, None, message, table, pie_chart, tabs
     
-            else:
-                message = "Attenzione, la somma dei pesi non è 100"
+    
+    
+    #passo tutti gli input utente al motore
+    risultati = motore.EseguiAnalisi(input_utente)
+    
+    
+    
+    #controlla validità importo minimo rate
+    if(risultati == "ERRORE RATA MENSILE"):
+        message = "Attenzione, l'importo della rata è troppo piccolo"
+        return fig, None, message, table, pie_chart, tabs
+    elif(risultati == "ERRORE IMPORTO MINIMO"):
+        message = "Attenzione, l'importo minimo su uno dei fondi è troppo piccolo"
+        return fig, None, message, table, pie_chart, tabs
+    
+    
 
-    return fig, None, message, table, pie_chart, tabs    # Returns figure to the graph, None to the 'dummy-output', and the error message to 'error-message'.
+        
+    #GRAFICO GRANDE CON LE PERFORMANCE
+    grafico_ptf = risultati["portafoglio"]["grafico"]
+
+    grafico_ptf = pd.DataFrame({
+        'x': grafico_ptf.index,
+        'y1': grafico_ptf["ctv_netto"],
+        'y2': grafico_ptf["movimenti"]
+    })
+
+    df_bar = grafico_ptf.iloc[::10, :]
+
+    fig = {
+        'data': [
+            go.Scatter(  # linea
+                x=grafico_ptf['x'],
+                y=grafico_ptf['y1'],
+                mode='lines',
+                name='Controvalore Netto'
+            ),
+            go.Bar(  # barre
+                x=df_bar['x'],
+                y=df_bar['y2'],
+                name='Importo Versato',
+                width=3
+            )
+        ],
+        'layout': go.Layout(
+            title='Grafico della simulazione',
+            title_font=dict(
+            size=25,
+            family="Verdana, bold"
+        ),
+            yaxis={'title': 'Valore'}
+        )
+    }
 
 
 
+    
+    #DATI DA METTERE NELLA TABELLA DELLE PERFORMANCE
+    #LE CHIAVI SONO I TITOLI DELLA TABELLA
+    dati_tabella_perf = {
+        
+        "Frequenza Rate": frequenza,
+        "Importo Rata": str(importo_rata) + "€",
+        "Totale Rate Versate": str(risultati["portafoglio"]["totale_rate_versate"]) + "€",
+        "Patrimonio Finale": str(int(risultati["portafoglio"]["patrimonio_finale"])) + "€",
+        "Plus/Minus": str(int(risultati["portafoglio"]["plus"])) + "€",
+        "MWRR Totale": str(round(risultati["portafoglio"]["mwrr"] * 100 ,2)) + "%",
+        "MWRR Annualizzato": str(round(risultati["portafoglio"]["mwrr_annualizzato"] * 100 ,2)) + "%",
+        "Volatilita": str(round(risultati["portafoglio"]["volatilita_finale"] * 100 ,2)) + "%",
+        "Max DD": str(round(risultati["portafoglio"]["max_dd"] * 100 ,2)) + "%"
+        
+    }
+    
+    #TABELLA DELLE PERFORMANCE
+    table = html.Table(className='my-table', children=[
+        html.Tbody([
+            html.Tr([
+                html.Div(className='row', children=[
+                    html.Div(className='col-6', children=[html.Th(col)]),
+                    html.Div(className='col-6', children=[html.Td(dati_tabella_perf[col])])
+                ])
+            ]) for col in dati_tabella_perf.keys()
+        ])
+    ])
+    
+    
+    
+
+    
+    #GRAFICO A TORTA
+    pie_chart = go.Figure()
+
+    labels = ["Versato", "Contributo Mercato"]
+    values = [risultati["portafoglio"]["totale_rate_versate"], (risultati["portafoglio"]["patrimonio_finale"] - risultati["portafoglio"]["totale_rate_versate"])]
+
+    pie_chart.add_trace(go.Pie(labels=labels, values=values))
+    
+    
+    
+    
+    
+    #TABS CON I VARI GRAFICI
+    if isin_selezionati is None or len(isin_selezionati) == 0:
+        return []
+    else:
+        tabs = []
+        for i, value in enumerate(isin_selezionati):
+            
+            # value = isin del fondo
+                                     
+            x_values = risultati["singoli_fondi"][value]["calcoli"].index
+            y_values1 = risultati["singoli_fondi"][value]["calcoli"][value]
+            y_values2 = risultati["singoli_fondi"][value]["calcoli"]["pmc"]
+            y_values3 = risultati["singoli_fondi"][value]["calcoli"]["prezzo_medio"]
+            
+            trace1 = go.Scatter(x=x_values, y=y_values1, mode='lines', name='Prezzo')
+            trace2 = go.Scatter(x=x_values, y=y_values2, mode='lines', name='PMC')
+            trace3 = go.Scatter(x=x_values, y=y_values3, mode='lines', name='Prezzo medio')
+            
+            data = [trace1, trace2, trace3]
+            
+            
+            tab = dcc.Tab(label=value, children=[
+                
+                dcc.Graph(
+                    id={'type': 'dynamic-graph', 'index': value},
+                    figure={'data': data, 
+                           }
+                )
+            ])
+            
+            tabs.append(tab)
+ 
+
+    return fig, None, message, table, pie_chart, tabs
 
 
 
