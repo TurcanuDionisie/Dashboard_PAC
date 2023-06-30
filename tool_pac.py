@@ -31,25 +31,23 @@ import plotly.graph_objects as go
 import funzioni_dashboard
 import motore
 
-#%% CALCOLI INIZIALI
+#%% LETTURA FILE EXCEL
 
-
-def generate_data(value):
-    # Genera una lista di 100 numeri casuali tra 0 e 100 per l'asse x
-    x = [random.uniform(0, 100) for _ in range(100)]
-    # Genera una lista di 100 numeri casuali tra 0 e 100 per l'asse y
-    y = [random.uniform(0, 100) for _ in range(100)]
-    return {'x': x, 'y': y}
-
-
-#decodifiche FONDO - SGR
+#decodifiche FONDO - Prodotto
 codifiche = pd.read_excel("codifiche.xlsx", index_col=0)
 SGR = codifiche['FAMIGLIA'].unique()
 
 
+#lettura quote
+quote = pd.read_excel("DB_TOT_PROXY.xlsx", index_col=0)
 
 
-#FONDI DA INSIERIRE NEL MULTIDROPDOWN
+
+#%% VALORI CHE POPOLANO I VARI COMPONENTI
+
+
+
+#FONDI E PRODOTTI PER MULTIDROPDOWN
 df_options = pd.DataFrame({
     'OptionID': SGR,
     'OptionLabel': SGR,
@@ -61,8 +59,6 @@ df_suboptions = pd.DataFrame({
     'SubOptionValue': codifiche.index,
 })
 
-
-# Opzioni per il menu a discesa di base
 basic_options = {}
 for _, row in df_options.iterrows():
     option_id = row['OptionID']
@@ -73,16 +69,14 @@ for _, row in df_options.iterrows():
 
 
 
-#lettura quote
-quote = pd.read_excel("DB_TOT_PROXY.xlsx", index_col=0)
 
-
-#data inizio
-datetime_index = quote.index
+#DATE INIZIO SIMULAZIONE
+data_inizio_simulazione = quote.index
 
 
 
 
+#FREQUENZE
 frequenze = {
     'Mensile': 'Mensile',
     'Bimestrale': 'Bimestrale',
@@ -95,6 +89,7 @@ frequenze = {
 
 
 
+#DEROGHE
 selezione_deroga = {
     'Nessuna': 'Nessuna',
     'Iniziale 25%': 'Iniziale 25%',
@@ -115,17 +110,13 @@ selezione_deroga = {
 app = dash.Dash(__name__, title ='Tool PAC', external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 
-
+#CSS
 app.css.append_css({
     'external_url': '/assets/style.css'
 })
 
 
 server = app.server
-
-# Add the following line to set the favicon
-
-#use href="/assets/favicon.ico" to get favicon from local folder (named 'assets' and subdirectory) instead of github
 
 app.index_string = '''
     <!DOCTYPE html>
@@ -156,6 +147,7 @@ app.layout = html.Div(className="container", children=[
     html.H1('Dashboard Piano PAC', style={'textAlign': 'center', 'width': '100%', 'marginTop': '40px'}),
 
     
+    #INPUT FORM
     html.Div(className="row sezione", children=[
         
         # First column
@@ -164,7 +156,7 @@ app.layout = html.Div(className="container", children=[
                 html.Div(className="col-6", children=html.P("Data Inizio:", className="label text-right")),
                 html.Div(className="col-6", children=dcc.Dropdown(
                     id='data-inizio',
-                    options=[{'label': str(date), 'value': str(date)} for date in datetime_index],
+                    options=[{'label': str(date), 'value': str(date)} for date in data_inizio_simulazione],
                     value=None
                 ))
             ]),
