@@ -371,7 +371,7 @@ def update_table(selected_values, data):
         rows = []
         for i, value in enumerate(selected_values):
             row = html.Tr(children=[
-                html.Td(className='col-3 peso-isin', children=value),
+                html.Td(className='col-8 peso-isin', children= file_codifiche_prodotto['NOME'].loc[value]),
                 html.Td(className='col', children=dbc.InputGroup([
                     dcc.Input(
                         value=data.get(value, ""),
@@ -665,7 +665,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             data = [trace1, trace2, trace3]
             
             
-            tab = dcc.Tab(label=value, children=[
+            tab = dcc.Tab(label=file_codifiche_prodotto['NOME'].loc[value], children=[
                 
                 dcc.Graph(
                     id={'type': 'dynamic-graph', 'index': value},
