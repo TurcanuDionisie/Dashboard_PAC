@@ -461,14 +461,14 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
                     dati_tabella_perf = {
                         
                         "Frequenza Rate": frequenza,
-                        "Importo Rata": importo_rata,
-                        "Totale Rate Versate": risultati["portafoglio"]["Totale rate versate"],
-                        "Patrimonio Finale": round(risultati["portafoglio"]["patrimonio finale"],2),
-                        "Plus/Minus": round(risultati["portafoglio"]["plus"] ,2),
-                        "MWRR Totale": round(risultati["portafoglio"]["MWRR"] * 100 ,3),
-                        "MWRR Annualizzato": round(risultati["portafoglio"]["MWRR_annualizzato"] * 100 ,3),
-                        "Volatilita": round(risultati["portafoglio"]["Volatilita_finale"] * 100 ,3),
-                        "Max DD": round(risultati["portafoglio"]["Max_DD"] * 100 ,3)
+                        "Importo Rata": str(importo_rata) + "€",
+                        "Totale Rate Versate": str(risultati["portafoglio"]["Totale rate versate"]) + "€",
+                        "Patrimonio Finale": str(round(risultati["portafoglio"]["patrimonio finale"],0)) + "€",
+                        "Plus/Minus": str(round(risultati["portafoglio"]["plus"] ,0)) + "€",
+                        "MWRR Totale": str(round(risultati["portafoglio"]["MWRR"] * 100 ,2)) + "%",
+                        "MWRR Annualizzato": str(round(risultati["portafoglio"]["MWRR_annualizzato"] * 100 ,2)) + "%",
+                        "Volatilita": str(round(risultati["portafoglio"]["Volatilita_finale"] * 100 ,2)) + "%",
+                        "Max DD": str(round(risultati["portafoglio"]["Max_DD"] * 100 ,2)) + "%"
                         
                     }
                     
