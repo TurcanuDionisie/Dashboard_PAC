@@ -64,6 +64,7 @@ SGR = file_codifiche_prodotto['FAMIGLIA'].unique()
 file_quote = pd.read_excel("DB_TOT_PROXY.xlsx", index_col=0)
 
 
+
 #lettura file costi
 file_costi = pd.read_excel('costi.xlsx', index_col=0)
 
@@ -97,7 +98,7 @@ for _, row in df_options.iterrows():
 
 
 #DATE INIZIO SIMULAZIONE
-data_inizio_simulazione = file_quote.index
+data_inizio_simulazione = file_quote.index.strftime('%d/%m/%Y')
 
 
 
@@ -410,6 +411,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
     table = {}
     pie_chart = {}
     tabs = {}
+    
 
     
     if n_clicks <= 0:
@@ -432,23 +434,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
     
     
     
-    # input_utente = {
-    #     "isin_selezionati": isin_peso,
-    #     "data_inizio": data_inizio,
-    #     "importo_rata": importo_rata,
-    #     "frequenza": frequenza,
-    #     "durata_anni": durata,
-    #     "giorno_mese": giorno_versamento,
-        
-    #     #dati letti da excel
-    #     "file_quote": file_quote,
-    #     "file_costi": file_costi
-        
-    # }
-    
-    
-    # print(input_utente)
-    
+
         
         
     # estrae e formatta input inseriti dall'utente   
@@ -527,20 +513,22 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
 
 
 
+
+
     
     #DATI DA METTERE NELLA TABELLA DELLE PERFORMANCE
     #LE CHIAVI SONO I TITOLI DELLA TABELLA
     dati_tabella_perf = {
         
         "Frequenza Rate": frequenza,
-        "Importo Rata": str(importo_rata) + "€",
-        "Totale Rate Versate": str(risultati["portafoglio"]["totale_rate_versate"]) + "€",
-        "Patrimonio Finale": str(int(risultati["portafoglio"]["patrimonio_finale"])) + "€",
-        "Plus/Minus": str(int(risultati["portafoglio"]["plus"])) + "€",
-        "MWRR Totale": str(round(risultati["portafoglio"]["mwrr"] * 100 ,2)) + "%",
-        "MWRR Annualizzato": str(round(risultati["portafoglio"]["mwrr_annualizzato"] * 100 ,2)) + "%",
-        "Volatilita": str(round(risultati["portafoglio"]["volatilita_finale"] * 100 ,2)) + "%",
-        "Max DD": str(round(risultati["portafoglio"]["max_dd"] * 100 ,2)) + "%"
+        "Importo Rata": "{:,}".format(int(importo_rata)).replace(",", ".") + "€",
+        "Totale Rate Versate": "{:,}".format(int(risultati["portafoglio"]["totale_rate_versate"])).replace(",", ".") + "€",
+        "Patrimonio Finale": "{:,}".format(int(risultati["portafoglio"]["patrimonio_finale"])).replace(",", ".") + "€",
+        "Plus/Minus": "{:,}".format(int(risultati["portafoglio"]["plus"])).replace(",", ".") + "€",
+        "MWRR Totale": "{:,.2f}".format(round(risultati["portafoglio"]["mwrr"] * 100 ,2)).replace(".", ",") + "%",
+        "MWRR Annualizzato": "{:,.2f}".format(round(risultati["portafoglio"]["mwrr_annualizzato"] * 100 ,2)).replace(".", ",") + "%",
+        "Volatilita": "{:,.2f}".format(round(risultati["portafoglio"]["volatilita_finale"] * 100 ,2)).replace(".", ",") + "%",
+        "Max DD": "{:,.2f}".format(round(risultati["portafoglio"]["max_dd"] * 100 ,2)).replace(".", ",") + "%",
         
     }
     
