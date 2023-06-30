@@ -1,4 +1,7 @@
 
+
+
+
 .row > .col,
 .row > [class*='col-'] {
     padding-right: 10px;
@@ -54,14 +57,19 @@
 
 
 
-
-.table-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+.align-vertical {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
 }
 
-.table-container table {
-  margin-top: auto;
+
+.my-table th, .my-table td {
+    width: 50%;
+}
+
+
+.sezione{
+	margin-top: 60px;
 }

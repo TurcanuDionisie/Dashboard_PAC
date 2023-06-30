@@ -152,7 +152,7 @@ app.index_string = '''
 
 
 app.layout = html.Div(className="container", children=[
-    html.Div(className="row", children=[
+    html.Div(className="row sezione", children=[
         
         # First column
         html.Div(className="col-6", children=[
@@ -254,8 +254,9 @@ app.layout = html.Div(className="container", children=[
     
     
     
-    html.Div(className="row", children=[
+    html.Div(className="row sezione", children=[
         
+        # html.H3('Grafico della simulazione', style={'text-align': 'center', 'width': '100%'}),
         dcc.Graph(id='result-graph'),
         
     ]),
@@ -263,22 +264,23 @@ app.layout = html.Div(className="container", children=[
     
     
     
-    html.Div(className="row", children=[
+    html.Div(className="row align-vertical sezione", children=[
         
-        html.Div(className="col-6", children=[
+        html.H3('Valori alla data finale della simulazione', style={'text-align': 'center', 'width': '100%'}),
+            
+        html.Div(className="col-6 align-vertical", children=[
             html.Div(id='table-div'),
         ]),
         
-        html.Div(className="col-6", children=[
+        html.Div(className="col-6 align-vertical", children=[
            dcc.Graph(id='pie-chart'),
         ]),
-        
         
     ]),
     
    
     
-    html.Div(className="row", children=[
+    html.Div(className="row sezione", children=[
         
         dcc.Tabs(id="my-tabs"),
         
@@ -431,18 +433,21 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
                                 x=grafico_ptf['x'],
                                 y=grafico_ptf['y1'],
                                 mode='lines',
-                                name='Linea'
+                                name='Controvalore Netto'
                             ),
                             go.Bar(  # barre
                                 x=df_bar['x'],
                                 y=df_bar['y2'],
-                                name='Barre',
+                                name='Importo Versato',
                                 width=3
                             )
                         ],
                         'layout': go.Layout(
-                            title='Linea e Barre su un Unico Grafico',
-                            xaxis={'title': 'Data'},
+                            title='Grafico della simulazione',
+                            title_font=dict(
+                            size=25,
+                            family="Verdana, bold"
+                        ),
                             yaxis={'title': 'Valore'}
                         )
                     }
@@ -466,14 +471,20 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
                 
                 
                     # Code to create the table
-                    table = html.Table([
+                    table = html.Table(className='my-table', children=[
                         html.Tbody([
                             html.Tr([
-                                html.Th(col),
-                                html.Td(dati_tabella_perf[col])
+                                html.Div(className='row', children=[
+                                    html.Div(className='col-6', children=[html.Th(col)]),
+                                    html.Div(className='col-6', children=[html.Td(dati_tabella_perf[col])])
+                                ])
                             ]) for col in dati_tabella_perf.keys()
                         ])
                     ])
+                    
+                    
+                    
+
                     
     
                     pie_chart = go.Figure()
@@ -513,7 +524,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
                                 dcc.Graph(
                                     id={'type': 'dynamic-graph', 'index': value},
                                     figure={'data': data, 
-                                            'layout': go.Layout(title='My Plot', xaxis=dict(title='X'), yaxis=dict(title='Y'))}
+                                           }
                                 )
                             ])
                             tabs.append(tab)
