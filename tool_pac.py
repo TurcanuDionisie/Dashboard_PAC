@@ -536,26 +536,46 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
                 y=grafico_ptf['y1'],
                 mode='lines',
                 name='Controvalore Netto',
-                hovertemplate='%{y:.2f}',  # add this line
+                hovertemplate='%{y:.2f}', 
             ),
             go.Bar(  # barre
                 x=df_bar['x'],
                 y=df_bar['y2'],
                 name='Importo Versato',
                 width=3,
-                hovertemplate='%{y:.2f}',  # add this line
+                hovertemplate='%{y:.2f}', 
             )
         ],
         'layout': go.Layout(
-            title='Grafico della simulazione',
-            title_font=dict(
-            size=25,
-            family="Verdana, bold"
-        ),
+            title={
+                'text': 'Grafico della simulazione',  # use HTML-like syntax to apply bold
+                'font': {
+                    'family': "Verdana",
+                    'size': 25,
+                    # 'color': "black",
+                },
+                'y':0.9, #change position as per your requirement
+                'x':0.5, #change position as per your requirement
+                'xanchor': 'center',
+                'yanchor': 'top'
+            },
             yaxis={'title': 'Valore'},
-            hovermode='x unified'  # add this line
+            hovermode='x unified', 
+            legend=dict(
+                orientation="h",  
+                yanchor="bottom",
+                y=-0.2,  
+                xanchor="center",
+                x=0.5, 
+                font=dict(
+                    size=15,  
+                    color="black"  
+                )
+            )
         )
     }
+
+
 
 
 
