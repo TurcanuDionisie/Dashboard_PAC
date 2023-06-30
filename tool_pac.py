@@ -296,13 +296,12 @@ app.layout = html.Div(className="container", children=[
     
     
     
-    #TABELLA PERFORMANCE E GRAFICO A TORTA
     html.Div(className="row align-vertical sezione", children=[
         
         html.H3('Valori alla data finale della simulazione', style={'text-align': 'center', 'width': '100%'}),
             
         html.Div(className="col-6 align-vertical", children=[
-            html.Div(id='table-div'),
+            html.Div(id='table-div', style={'width': '100%'}),
         ]),
         
         html.Div(className="col-6 align-vertical", children=[
@@ -310,6 +309,7 @@ app.layout = html.Div(className="container", children=[
         ]),
         
     ]),
+
     
    
     
@@ -583,10 +583,26 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
 
     
     #DATI DA METTERE NELLA TABELLA DELLE PERFORMANCE
+    
+    # Mappa la frequenza a un numero di mesi
+    codifica_mesi = {
+        'Mensile': 1,
+        'Bimestrale': 2,
+        'Trimestrale': 3,
+        'Quadrimestrale': 4,
+        'Semestrale': 6,
+        'Annuale': 12,
+    }
+    
+    num_mesi = codifica_mesi[frequenza]
+    numero_rate = (12 / num_mesi) * int(durata)
+    
+    
     #LE CHIAVI SONO I TITOLI DELLA TABELLA
     dati_tabella_perf = {
         
         "Frequenza Rate": frequenza,
+        "Numero Rate": numero_rate,
         "Importo Rata": "{:,}".format(int(importo_rata)).replace(",", ".") + "€",
         "Totale Rate Versate": "{:,}".format(int(risultati["portafoglio"]["totale_rate_versate"])).replace(",", ".") + "€",
         "Patrimonio Finale": "{:,}".format(int(risultati["portafoglio"]["patrimonio_finale"])).replace(",", ".") + "€",
@@ -599,17 +615,21 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
     }
     
     #TABELLA DELLE PERFORMANCE
-    table = html.Table(className='my-table', children=[
+    table = html.Table(className='my-table', style={'width': '100%'}, children=[
         html.Tbody([
             html.Tr([
                 html.Div(className='row', children=[
-                    html.Div(className='col-6', children=[html.Th(col)]),
-                    html.Div(className='col-6', children=[html.Td(dati_tabella_perf[col])])
+                    html.Div(className='col-6 d-flex justify-content-end', children=[
+                        html.Th(col)
+                    ]),
+                    html.Div(className='col-6 d-flex justify-content-center', children=[
+                        html.Td(dati_tabella_perf[col])
+                    ])
                 ])
             ]) for col in dati_tabella_perf.keys()
         ])
     ])
-    
+
     
     
 

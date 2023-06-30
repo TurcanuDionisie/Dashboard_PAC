@@ -66,10 +66,12 @@
 
 
 .my-table th, .my-table td {
-    width: 50%;
+    width: 100%;
+	text-align: right;
 }
 
 
 .sezione{
-	margin-top: 55px;
+	margin-top: 60px;
 }
+
