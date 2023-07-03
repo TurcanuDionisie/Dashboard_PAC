@@ -56,17 +56,17 @@ def controlloSommaPesi(pesi):
 #%% LETTURA FILE EXCEL
 
 #decodifiche FONDO - Prodotto
-file_codifiche_prodotto = pd.read_excel("codifiche.xlsx", index_col=0)
+file_codifiche_prodotto = pd.read_excel("excel/codifiche.xlsx", index_col=0)
 SGR = file_codifiche_prodotto['FAMIGLIA'].unique()
 
 
 #lettura quote
-file_quote = pd.read_excel("DB_TOT_PROXY.xlsx", index_col=0)
+file_quote = pd.read_excel("excel/DB_TOT_PROXY.xlsx", index_col=0)
 
 
 
 #lettura file costi
-file_costi = pd.read_excel('costi.xlsx', index_col=0)
+file_costi = pd.read_excel('excel/costi.xlsx', index_col=0)
 
 
 
