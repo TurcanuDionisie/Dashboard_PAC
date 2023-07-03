@@ -193,6 +193,7 @@ app.layout = html.Div(className="container", children=[
                     dcc.Input(
                         id='importo-rata',
                         type='text',
+                        value=None,
                         placeholder='Importo rata',
                         className='input-form form-control'
                     ),
@@ -236,7 +237,7 @@ app.layout = html.Div(className="container", children=[
                             {'label': '8', 'value': '8'},
                             {'label': '28', 'value': '28'},
                         ],
-                    value='10',
+                    value='8',
                 ))
             ]),
             html.Div(className="input-group", children=[
@@ -244,13 +245,14 @@ app.layout = html.Div(className="container", children=[
                 html.Div(className="col-8", children=dcc.Dropdown(
                     id='basic-dropdown',
                     options=[{'label': key, 'value': key} for key in basic_options.keys()],
-                    value='Opzione 1',
+                    value='MBB',
                 ))
             ]),
             html.Div(className="input-group", children=[
                 html.Div(className="col-4", children=html.P("Fondo Comume:", className="label text-right")),
                 html.Div(className="col-8", children=dcc.Dropdown(
                     id='multi-dropdown',
+                    value=None,
                     multi=True
                 ))
             ]),
@@ -438,7 +440,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
         
     
     #controlla che i campi in input siano tutti compilati
-    if data_inizio is None or importo_rata is None or isin_selezionati is None or isin_peso is None:
+    if data_inizio is None or importo_rata is None or frequenza is None or durata is None or deroga is None or giorno_versamento is None or (len(isin_selezionati) == 0) or (len(isin_peso) == 0):
         message = "Attenzione, non hai compilato tutti i campi"
         return fig, None, message, table, pie_chart, tabs
     
@@ -475,7 +477,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
         }
         
     except:
-        message = "Attenzione, errore nei campi di input"
+        message = "Attenzione, errore in un campo in input"
         return fig, None, message, table, pie_chart, tabs
     
     
