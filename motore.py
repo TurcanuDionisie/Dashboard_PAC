@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 
-
 import funzioni_motore
 
 
@@ -43,10 +42,7 @@ def EseguiAnalisi (input_motore):
     durata_anni = input_motore['durata_anni']
     giorno_del_mese = input_motore['giorno_mese']
     
-    #non ancora gestito
-    data_inizio = input_motore['data_inizio']
-    
-    
+   
     
     deroga = input_motore['deroga']
     
@@ -176,14 +172,10 @@ def EseguiAnalisi (input_motore):
         
         
         #calcolo le performance del fondo
+        
         risultati_performance[isin] = funzioni_motore.calcola_performance(dati_input_performance)
         
-
-
-    
-    
-    
-    
+        
     
     
     #dati input per calcolo performance portafolgio
@@ -199,7 +191,22 @@ def EseguiAnalisi (input_motore):
     elaborazione = funzioni_motore.CalcolaPerformancePortafolgio(dati_input_portafolgio)
     
     
+
     
+    #SALVO CALCOLI SU EXCEL
+    #ELIMINARE DOPO
+    with pd.ExcelWriter('test/output.xlsx') as writer:  
+        for isin in fondi:
+            temp_excel = risultati_performance[isin]['calcoli'].copy()
+            temp_excel.replace(0, np.nan, inplace=True)
+            temp_excel.to_excel(writer, sheet_name=isin)
+            
+            
+        temp_excel = elaborazione['calcoli'].copy()
+        temp_excel.replace(0, np.nan, inplace=True)
+        temp_excel.to_excel(writer, sheet_name="PORTAFOLGIO")
+        
+
     
 
     

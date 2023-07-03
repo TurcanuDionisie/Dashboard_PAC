@@ -1,36 +1,18 @@
 import pandas as pd
-import numpy as np
-import os
-from datetime import datetime as dt
-from dateutil.relativedelta import relativedelta
-import matplotlib.pyplot as plt
+
+
 import plotly.graph_objs as go
-import math
+
 
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output, State, ALL
-from dash import dash_table
-from dash import ctx
+from dash.dependencies import Input, Output, ALL
 import dash_bootstrap_components as dbc
-from PIL import Image
-from io import BytesIO
-import requests
-import random
 
-
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
-from dash.dependencies import Input, Output, State
-import pandas as pd
-import plotly.graph_objects as go
 
 
 import motore
-
-
 
 #%% FUNZIONI PER DASHBOARD
 
@@ -463,7 +445,6 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
         
         input_utente = {
             "isin_selezionati": isin_peso,
-            "data_inizio": data_inizio,
             "importo_rata": int(importo_rata),
             "frequenza": frequenza,
             "durata_anni": int(durata),

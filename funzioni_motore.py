@@ -485,6 +485,7 @@ def CalcolaPerformancePortafolgio(dati_input):
         "mwrr_annualizzato": mwrr_annualizzato,
         "volatilita_finale": volatilita_finale,
         "max_dd": max_dd,
+        "calcoli": portafolgio,
         
         #dati per grafico portafoglio
         "grafico": grafico
