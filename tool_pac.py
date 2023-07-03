@@ -80,7 +80,7 @@ for _, row in df_options.iterrows():
 
 
 #DATE INIZIO SIMULAZIONE
-data_inizio_simulazione = file_quote.index.strftime('%d/%m/%Y')
+data_inizio_simulazione = file_quote.index.strftime('%m/%d/%Y')
 
 
 
@@ -456,6 +456,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             "file_costi": file_costi
             
         }
+        
         
     except:
         message = "Attenzione, errore in un campo in input"

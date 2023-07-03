@@ -171,6 +171,7 @@ def EseguiAnalisi (input_motore):
         }
         
         
+        
         #calcolo le performance del fondo
         
         risultati_performance[isin] = funzioni_motore.calcola_performance(dati_input_performance)
