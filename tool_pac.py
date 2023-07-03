@@ -267,6 +267,7 @@ app.layout = html.Div(className="container", children=[
         ]),
         # Seconda colonna
         html.Div(className="col-6", children=[
+            html.Div(id='table-title'),
             html.Table(id='my-table', children=[])
         ]),
     ]),
@@ -277,7 +278,8 @@ app.layout = html.Div(className="container", children=[
     #MESSAGGIO ERRORE
     html.Div(className="row", children=[
         
-        html.Div(id='error-message'),
+        html.H4(id='error-message', className="messaggio-errore")
+        
         
     ]),
     
@@ -315,7 +317,6 @@ app.layout = html.Div(className="container", children=[
     
     #TABS CON I VARI GRAFICI
     html.Div(className="row sezione", children=[
-        
         dcc.Tabs(id="my-tabs"),
         
     ]),
@@ -358,7 +359,19 @@ def update_multi_dropdown(selected_value):
 
 
 
-#GESTISCE TABELLA DINAMICA DEI PESI
+#TITOLO TABELLA DEI PESI
+@app.callback(
+    Output('table-title', 'children'),
+    [Input('my-table', 'children')]
+)
+def update_title(table_children):
+    if table_children:  # if the table is not empty
+        return html.H4('Inserisci Peso Percentuale')
+    else:
+        return "" 
+
+
+#TABELLA DINAMICA CON I PESI
 @app.callback(
     Output('my-table', 'children'),
     [Input('multi-dropdown', 'value'),
@@ -366,22 +379,21 @@ def update_multi_dropdown(selected_value):
 )
 def update_table(selected_values, data):
     if selected_values is None or len(selected_values) == 0:
-        data.clear()
         return []
     else:
         rows = []
         for i, value in enumerate(selected_values):
             row = html.Tr(children=[
-                html.Td(className='col-8 peso-isin', children= file_codifiche_prodotto['NOME'].loc[value]),
                 html.Td(className='col', children=dbc.InputGroup([
                     dcc.Input(
                         value=data.get(value, ""),
-                        id={'type': 'dynamic-input', 'index': value},  
+                        id={'type': 'dynamic-input', 'index': value},
                         type='text',
-                        className='form-control input-form-pesi'  # Here, you apply the Bootstrap class to the input component
+                        className='form-control input-form-pesi'
                     ),
                     dbc.InputGroupText("%")
-                ], className='input-group'))  # And you apply other Bootstrap classes to the InputGroup component
+                ], className='input-group')),
+                html.Td(className='col-8 peso-isin', children= file_codifiche_prodotto['NOME'].loc[value]),
             ])
             rows.append(row)
         return rows
