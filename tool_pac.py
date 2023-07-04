@@ -44,6 +44,7 @@ SGR = file_codifiche_prodotto['FAMIGLIA'].unique()
 
 #lettura quote
 file_quote = pd.read_excel("excel/DB_TOT_PROXY.xlsx", index_col=0)
+file_quote.index = pd.to_datetime(file_quote.index, format='%d-%m-%Y')
 
 
 
@@ -80,7 +81,8 @@ for _, row in df_options.iterrows():
 
 
 #DATE INIZIO SIMULAZIONE
-data_inizio_simulazione = file_quote.index.strftime('%d/%m/%Y')
+
+data_inizio_simulazione = file_quote.index.strftime('%d-%m-%Y')
 
 
 
@@ -409,6 +411,9 @@ def update_table(selected_values, data):
      ],
 )
 def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, deroga, giorno_versamento, isin_selezionati, isin_peso):
+    
+    
+    
     message = ""
     fig = {}
     table = {}
@@ -452,7 +457,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             "deroga": deroga,
             
             #dati letti da excel
-            "file_quote": file_quote[file_quote.index >= data_inizio],
+            "file_quote": file_quote[file_quote.index >= pd.to_datetime(data_inizio, format='%d-%m-%Y')],
             "file_costi": file_costi
             
         }
