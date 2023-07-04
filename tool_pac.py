@@ -80,7 +80,7 @@ for _, row in df_options.iterrows():
 
 
 #DATE INIZIO SIMULAZIONE
-data_inizio_simulazione = file_quote.index.strftime('%m/%d/%Y')
+data_inizio_simulazione = file_quote.index.strftime('%d/%m/%Y')
 
 
 
