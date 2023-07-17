@@ -840,14 +840,12 @@ selezione_deroga = {
 
 #%% DASHBOARD
 
-app = dash.Dash(__name__, title ='Tool PAC', external_stylesheets=[dbc.themes.BOOTSTRAP])
+external_stylesheets = [
+    'https://raw.githubusercontent.com/TurcanuDionisie/Dashboard_ER/main/assets/style.css',
+    dbc.themes.BOOTSTRAP
+]
 
-
-#CSS
-app.css.append_css({
-    'external_url': url+'assets/style.css'
-})
-
+app = dash.Dash(__name__, title ='Tool PAC', external_stylesheets=external_stylesheets)
 
 server = app.server
 
