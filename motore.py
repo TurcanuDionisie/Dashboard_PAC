@@ -226,3 +226,4 @@ def EseguiAnalisi (input_motore):
     return risultato_motore
     
     
+
