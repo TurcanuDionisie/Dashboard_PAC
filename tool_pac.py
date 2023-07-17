@@ -845,7 +845,7 @@ app = dash.Dash(__name__, title ='Tool PAC', external_stylesheets=[dbc.themes.BO
 
 #CSS
 app.css.append_css({
-    'external_url': '/assets/style.css'
+    'external_url': url+'assets/style.css'
 })
 
 
