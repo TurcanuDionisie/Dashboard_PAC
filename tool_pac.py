@@ -703,16 +703,16 @@ class Motore:
         
         #SALVO CALCOLI SU EXCEL
         #ELIMINARE DOPO
-        with pd.ExcelWriter('test/output.xlsx') as writer:  
-            for isin in fondi:
-                temp_excel = risultati_performance[isin]['calcoli'].copy()
-                temp_excel.replace(0, np.nan, inplace=True)
-                temp_excel.to_excel(writer, sheet_name=isin)
+        # with pd.ExcelWriter('test/output.xlsx') as writer:  
+        #     for isin in fondi:
+        #         temp_excel = risultati_performance[isin]['calcoli'].copy()
+        #         temp_excel.replace(0, np.nan, inplace=True)
+        #         temp_excel.to_excel(writer, sheet_name=isin)
                 
                 
-            temp_excel = elaborazione['calcoli'].copy()
-            temp_excel.replace(0, np.nan, inplace=True)
-            temp_excel.to_excel(writer, sheet_name="PORTAFOLGIO")
+        #     temp_excel = elaborazione['calcoli'].copy()
+        #     temp_excel.replace(0, np.nan, inplace=True)
+        #     temp_excel.to_excel(writer, sheet_name="PORTAFOLGIO")
             
     
         
@@ -1040,6 +1040,13 @@ app.layout = html.Div(className="container", children=[
         
     ]),
     
+    
+    #TABS CON I VARI GRAFICI DCA
+    html.Div(className="row sezione", children=[
+        dcc.Tabs(id="my-tabs-DCA"),
+        
+    ]),
+    
 
 
     
@@ -1127,7 +1134,8 @@ def update_table(selected_values, data):
      Output('error-message', 'children'),
      Output('table-div', 'children'),
      Output('pie-chart', 'figure'),
-     Output('my-tabs', 'children')],
+     Output('my-tabs', 'children'),
+     Output('my-tabs-DCA', 'children')],
     [Input('calcola', 'n_clicks'),
      Input('data-inizio', 'value'),
      Input('importo-rata', 'value'),
@@ -1152,6 +1160,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
     table = {}
     pie_chart = {}
     tabs = {}
+    tabs_DCA = {}
     
 
     
@@ -1396,6 +1405,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             y_values2 = risultati["singoli_fondi"][value]["calcoli"]["pmc"]
             y_values3 = risultati["singoli_fondi"][value]["calcoli"]["prezzo_medio"]
             
+            
             trace1 = trace1 = go.Scatter(
                 x=x_values, 
                 y=y_values1, 
@@ -1419,9 +1429,48 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             ])
             
             tabs.append(tab)
+            
+            
+            
+            
+            #TABS CON I VARI GRAFICI
+            if isin_selezionati is None or len(isin_selezionati) == 0:
+                return []
+            else:
+                tabs_DCA = []
+                for i, value in enumerate(isin_selezionati):
+                    
+                    # value = isin del fondo
+                                             
+                    x_values = risultati["singoli_fondi"][value]["calcoli"].index
+                    y_values1 = risultati["singoli_fondi"][value]["calcoli"]["pmc"] / risultati["singoli_fondi"][value]["calcoli"]["prezzo_medio"] - 1
+
+                                        
+                    trace1 = trace1 = go.Scatter(
+                        x=x_values, 
+                        y=y_values1, 
+                        mode='lines', 
+                        name='Dollar Cost Averaging',
+                        line=dict(color='#002060')  # Imposta il colore della linea
+                    )
+
+                    
+                    data = [trace1]
+                    
+                    
+                    tab = dcc.Tab(label=file_codifiche_prodotto['NOME'].loc[value], children=[
+                        
+                        dcc.Graph(
+                            id={'type': 'dynamic-graph', 'index': value},
+                            figure={'data': data, 
+                                   }
+                        )
+                    ])
+                    
+                    tabs_DCA.append(tab)
  
 
-    return fig, None, message, table, pie_chart, tabs
+    return fig, None, message, table, pie_chart, tabs, tabs_DCA
 
 
 
