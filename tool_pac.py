@@ -875,9 +875,21 @@ app.index_string = '''
 
 app.layout = html.Div(className="container", children=[
     
-    html.H1('Dashboard Piano PAC', style={'textAlign': 'center', 'width': '100%', 'marginTop': '40px'}),
+
+    html.Div(className="row intestazione", children=[
+        # Colonna per l'immagine
+        html.Div(className="col-5 d-flex align-items-center justify-content-end logo", children=[
+            html.Img(src='assets/logo.png')  # Aggiungi qui l'immagine
+        ]),
+        # Colonna per il titolo
+        html.Div(className="col-7 d-flex align-items-center titolo", children=[
+            html.H1('Dashboard Piano PAC', style={'textAlign': 'left'})  # Il titolo
+        ])
+    ]),
+
 
     
+
     #INPUT FORM
     html.Div(className="row sezione", children=[
         
@@ -991,10 +1003,11 @@ app.layout = html.Div(className="container", children=[
     
     
     
+    
     #GRAFICO SIMULAZIONE
     html.Div(className="row sezione", children=[
         
-        # html.H3('Grafico della simulazione', style={'text-align': 'center', 'width': '100%'}),
+        html.H3('Grafico della simulazione', style={'text-align': 'center', 'width': '100%'}),
         dcc.Graph(id='result-graph'),
         
     ]),
@@ -1258,6 +1271,7 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
                 mode='lines',
                 name='Controvalore Netto',
                 hovertemplate='%{y:.2f}', 
+                line=dict(color='#002060') 
             ),
             go.Bar(  # barre
                 x=df_bar['x'],
@@ -1265,37 +1279,31 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
                 name='Importo Versato',
                 width=3,
                 hovertemplate='%{y:.2f}', 
+                marker=dict(color='#86cbe7')
             )
         ],
         'layout': go.Layout(
-            title={
-                'text': 'Grafico della simulazione',  # use HTML-like syntax to apply bold
-                'font': {
-                    'family': "Verdana",
-                    'size': 25,
-                    # 'color': "black",
-                },
-                'y':0.9, #change position as per your requirement
-                'x':0.5, #change position as per your requirement
-                'xanchor': 'center',
-                'yanchor': 'top'
-            },
-            yaxis={'title': 'Valore'},
-            hovermode='x unified', 
-            legend=dict(
-                orientation="h",  
-                yanchor="bottom",
-                y=-0.2,  
-                xanchor="center",
-                x=0.5, 
-                font=dict(
-                    size=15,  
-                    color="black"  
-                )
-            )
-        )
-    }
-
+        yaxis={
+            'title': 'Valore',
+            'titlefont': {'size': 15, 'color': '#002060', 'family': 'Verdana'},
+            'tickfont': {'size': 12, 'color': '#002060', 'family': 'Verdana'}
+        },
+        xaxis={
+            'titlefont': {'size': 15, 'color': '#002060', 'family': 'Verdana'},
+            'tickfont': {'size': 12, 'color': '#002060', 'family': 'Verdana'}
+        },
+        hovermode='x unified',
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.2,
+            xanchor="center",
+            x=0.5,
+            font=dict(size=15, color="#002060", family="Verdana")
+        ),
+        margin=dict(l=50, r=20, t=20, b=20)
+    )
+}
 
 
 
@@ -1357,11 +1365,18 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
     
     #GRAFICO A TORTA
     pie_chart = go.Figure()
-
+    
     labels = ["Versato", "Contributo Mercato"]
     values = [risultati["portafoglio"]["totale_rate_versate"], (risultati["portafoglio"]["patrimonio_finale"] - risultati["portafoglio"]["totale_rate_versate"])]
-
-    pie_chart.add_trace(go.Pie(labels=labels, values=values))
+    
+    pie_chart.add_trace(go.Pie(
+        labels=labels, 
+        values=values,
+        marker=dict(colors=['#3568a1', '#6fbfe1']),  # Imposta i colori delle fette
+        textinfo='percent',  # Mostra solo le percentuali
+        insidetextfont=dict(size=16, color='white'),  # Imposta dimensione e colore del testo
+        hoverinfo='label+value+percent'  # Informazioni mostrate al passaggio del mouse
+    ))
     
     
     
@@ -1381,7 +1396,13 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             y_values2 = risultati["singoli_fondi"][value]["calcoli"]["pmc"]
             y_values3 = risultati["singoli_fondi"][value]["calcoli"]["prezzo_medio"]
             
-            trace1 = go.Scatter(x=x_values, y=y_values1, mode='lines', name='Prezzo')
+            trace1 = trace1 = go.Scatter(
+                x=x_values, 
+                y=y_values1, 
+                mode='lines', 
+                name='Prezzo',
+                line=dict(color='#002060')  # Imposta il colore della linea
+            )
             trace2 = go.Scatter(x=x_values, y=y_values2, mode='lines', name='PMC')
             trace3 = go.Scatter(x=x_values, y=y_values3, mode='lines', name='Prezzo medio')
             

@@ -1,5 +1,8 @@
 
-
+body{
+	color: #002060;
+	font-family: 'Mediolanum';
+}
 
 
 .row > .col,
@@ -11,10 +14,20 @@
 
 #my-table {
     width: 100%;
+	color: #002060;
+	font-family: 'Mediolanum';
+}
+
+#table-title{
+	color: #002060;
+	font-family: 'Mediolanum';
 }
 
 
-
+.input-group {
+    color: #002060;
+	font-family: 'Mediolanum';
+}
 
 
 .input-form-pesi {
@@ -30,6 +43,8 @@
 .btn{
 	width: 100%;
 	margin-top: 5px;
+	background-color: #002060;
+	font-family: 'Mediolanum';
 }
 
 
@@ -67,7 +82,13 @@
 
 
 .sezione{
-	margin-top: 60px;
+	margin-top: 70px;
+}
+
+.sezione h3{
+	color: white;
+	background-color: #002060;
+	padding: 8px;
 }
 
 
@@ -75,4 +96,29 @@
 .messaggio-errore{
 	text-align:center;
 	margin-top: 40px;
+	color: red;
+}
+
+
+.intestazione{
+	margin-top: 25px;
+	padding-bottom: 20px;
+	border-bottom: 3px solid #002060;
+}
+
+
+.logo img {
+	height: 70px;
+}
+
+
+@font-face {
+    font-family: 'Mediolanum';
+    src: url('MediolanumSans-Bold.ttf') format('truetype');
+}
+
+.titolo h1 {
+	color: #002060;
+	font-family: 'Mediolanum';
+	font-weight: bold;
 }
