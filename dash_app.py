@@ -368,19 +368,6 @@ def calcola_performance(dati_input):
     
     
     
-    #volatilià a 1 anno rolling
-    
-    # Il tuo codice esistente per calcolare la volatilità
-    vol_annuale = pd.DataFrame(quote['ctv_complessivo'].resample('M').last().pct_change()).dropna()
-    vol_annuale['volatilita_rolling'] = vol_annuale['ctv_complessivo'].rolling(window=12).std()
-    vol_annuale['volatilita_rolling_annuale'] = vol_annuale['volatilita_rolling'] * np.sqrt(12)
-    
-    # Riempire i valori mancanti per ogni giorno del mese con il valore mensile corrispondente
-    vol_annuale = vol_annuale.resample('D').ffill()
-    
-    # Se necessario, puoi limitare i dati al range originale delle date giornaliere
-    vol_annuale = vol_annuale.reindex(quote.index)
-    
     
     
     #COLONNA QUOTE
@@ -425,7 +412,6 @@ def calcola_performance(dati_input):
         "mwrr_annualizzato": mwrr_annualizzato,
         "volatilita_finale": volatilita_finale,
         "max_dd": max_dd,
-        "volatilita_rolling": vol_annuale, 
         
         #salvo tutti i passaggi perchè servono per altri calcoli
         "calcoli": quote
@@ -637,8 +623,8 @@ class Motore:
         #calcola costi
         costi = calcola_costi(dati_input_costi)
         
-        # print("COSTI")
-        # print(costi)
+        print("COSTI")
+        print(costi)
         
     
         
@@ -1221,7 +1207,15 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
         
         
         
-    
+        
+        print("QUESTI SONO I DATI DI INPUT DELLUTENTE")
+        
+        
+        print(input_utente)
+        
+        
+        
+        print("*************************************")
         
         
     except:
@@ -1452,65 +1446,41 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
             
             
             
-            
-            
-            
-            
-    #TABS CON I VARI GRAFICI
-    if isin_selezionati is None or len(isin_selezionati) == 0:
-        return []
-    else:
-        tabs_DCA = []
-        for i, value in enumerate(isin_selezionati):
-            
-            # value = isin del fondo
-                                     
-            x_values = risultati["singoli_fondi"][value]["calcoli"].index
-            y_values1 = risultati["singoli_fondi"][value]["volatilita_rolling"]["volatilita_rolling_annuale"]
-            y_values2 = risultati["singoli_fondi"][value]["calcoli"]["pmc"] / risultati["singoli_fondi"][value]["calcoli"]["prezzo_medio"] - 1
+            #TABS CON I VARI GRAFICI
+            if isin_selezionati is None or len(isin_selezionati) == 0:
+                return []
+            else:
+                tabs_DCA = []
+                for i, value in enumerate(isin_selezionati):
+                    
+                    # value = isin del fondo
+                                             
+                    x_values = risultati["singoli_fondi"][value]["calcoli"].index
+                    y_values1 = risultati["singoli_fondi"][value]["calcoli"]["pmc"] / risultati["singoli_fondi"][value]["calcoli"]["prezzo_medio"] - 1
 
-            
-                                
-            trace1 = go.Scatter(
-                x=x_values, 
-                y=y_values1, 
-                mode='lines', 
-                name='Volatilità',
-                line=dict(color='#002060'),  # Imposta il colore della linea
-                yaxis='y1'  # Associa questo tracciato all'asse Y1
-            )
-        
-            trace2 = go.Scatter(
-                x=x_values, 
-                y=y_values2, 
-                mode='lines', 
-                name='DCA',
-                yaxis='y2'  # Associa questo tracciato all'asse Y2
-            )
-        
-            data = [trace1, trace2]
-        
-            layout = go.Layout(
-                yaxis=dict(
-                    title='Volatilità',  # Titolo per il primo asse Y
-                    side='left'  # Posiziona questo asse a sinistra
-                ),
-                yaxis2=dict(
-                    title='PMC',  # Titolo per il secondo asse Y
-                    side='right',  # Posiziona questo asse a destra
-                    overlaying='y',  # Sovrapponi questo asse con il primo asse Y
-                    anchor='x'  # Ancora l'asse al tracciato X
-                )
-            )
-        
-            tab = dcc.Tab(label=file_codifiche_prodotto['NOME'].loc[value], children=[
-                dcc.Graph(
-                    id={'type': 'dynamic-graph', 'index': value},
-                    figure={'data': data, 'layout': layout}
-                )
-            ])
-        
-            tabs_DCA.append(tab)
+                                        
+                    trace1 = trace1 = go.Scatter(
+                        x=x_values, 
+                        y=y_values1, 
+                        mode='lines', 
+                        name='Dollar Cost Averaging',
+                        line=dict(color='#002060')  # Imposta il colore della linea
+                    )
+
+                    
+                    data = [trace1]
+                    
+                    
+                    tab = dcc.Tab(label=file_codifiche_prodotto['NOME'].loc[value], children=[
+                        
+                        dcc.Graph(
+                            id={'type': 'dynamic-graph', 'index': value},
+                            figure={'data': data, 
+                                   }
+                        )
+                    ])
+                    
+                    tabs_DCA.append(tab)
  
 
     return fig, None, message, table, pie_chart, tabs, tabs_DCA
@@ -1519,6 +1489,6 @@ def print_input_values(n_clicks, data_inizio, importo_rata, frequenza, durata, d
 
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(host='0.0.0.0', port=8080, debug=False, use_reloader=False)
 
 
